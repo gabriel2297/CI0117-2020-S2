@@ -1,0 +1,2 @@
+limpiar:
+	rm -f bermuda
