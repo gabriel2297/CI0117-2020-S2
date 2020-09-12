@@ -35,12 +35,12 @@ int main(int argc, char* argv[]) {
         pthread_join(pthread_list[x], NULL);
         clock_gettime(CLOCK_REALTIME, &fin);
         tmp = ( fin.tv_sec - inicio.tv_sec ) + ( fin.tv_nsec - inicio.tv_nsec ) / BILLION;
-        printf("Valor para %zu: %lf\n", x, tmp);
+        printf("Valor para el thread %zu: %lf\n", x+1, tmp);
         if(tmp < accum){
             accum = tmp;
         }
     }
-    printf("Valor final calculado: %lf\n", accum);
+    printf("El mejor tiempo de creacion y destruccion de threads calculado fue de %lf, para un total de %zu pruebas\n", accum, T);
     
     // liberar memoria
     free(pthread_list);
