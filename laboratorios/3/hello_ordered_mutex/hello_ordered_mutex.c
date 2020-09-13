@@ -2,80 +2,77 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-pthread_mutex_t mutex_t = PTHREAD_MUTEX_INITIALIZER;
+// declaring mutex 
+pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER; 
+pthread_cond_t condition_t = PTHREAD_COND_INITIALIZER;
 
-int next_thread = 0;
-pthread_cond_t* condition_t;
-// typedef struct {
-//     int next_thread;
-//     pthread_cond_t* condition_t;
-// } shared_data_t;
+typedef struct {
+    int next_thread;
+} shared_data_t;
 
 typedef struct {
     int thread_num;
-    // shared_data_t* shared_data;
+    shared_data_t* shared_data;
 } thread_data_t;
 
 void* helloWorld(void* args) {
-    // obtener los datos
-    thread_data_t* thread_data = (thread_data_t*) args;
-    //printf("threadnum requesting lock: %i\n", thread_data->thread_num);
-
-    // obtener el lock, si el thread aun no es el que tiene que imprimir, ponerlo a dormir
-    pthread_mutex_lock(&mutex_t);
+    thread_data_t *thread_data = (thread_data_t*) args;
     int thread_num = thread_data->thread_num;
-    //printf("threadnum with lock: %i\n", thread_data->thread_num);
-    if(next_thread != thread_num) {
-        //printf("threadnum accessing wait %i... putting all threads to sleep except %i\n", thread_data->thread_num, thread_data->thread_num);
-        pthread_cond_wait(&condition_t[thread_num], &mutex_t);
+    shared_data_t* shared_data = thread_data->shared_data;
+    //printf("Thread %i created successfully, trying to acquire the lock\n", thread_num);
+    pthread_mutex_lock(&lock);
+    //printf("Thread %i got the lock\n", thread_num);
+    while(thread_num != shared_data->next_thread) {
+        //printf("Next thread is %i, I am %i... sleeping\n", shared_data->next_thread, thread_num);
+        pthread_cond_wait(&condition_t, &lock);
     }
-    // una vez que sale de dormir, ya puede imprimir
-    next_thread++;
-    printf("Hello from thread %i... next thread is %i\n", thread_num, next_thread);
-    // despertar al siguiente thread para que corra
-    //printf("Waking up %i\n", *next_thread);
-    pthread_cond_signal(&condition_t[next_thread]);
-    //printf("before, next thread is %i and current thread is %i\n", *next_thread, thread_num);
-    pthread_mutex_unlock(&mutex_t);
-    //printf("thread %i has unlocked the mutex\n", thread_num);
-    return NULL;
+    ++shared_data->next_thread;
+    printf("Hello from thread %i, next thread is %i\n", thread_num, shared_data->next_thread);
+    pthread_cond_broadcast(&condition_t);
+    pthread_mutex_unlock(&lock);
+    //printf("Thread %i exiting after unlock\n", thread_num);
+    pthread_exit(NULL);
 }
 
-int main(int argc, char* argv[]) {
+
+int main(int argc, char* arg[]) {
 
     int thread_count = 0;
 
     if (argc >= 2) {
-        thread_count = (int)strtoul(argv[1], NULL, 10) - 1;
+        thread_count = (int)strtoul(arg[1], NULL, 10);
     } else {
         fprintf(stderr, "Error, invalid number of parameters\n");
         return 1;
     }
 
-    // poner los datos iniciales en la informacion que vamos a compartir entre threads
-    // shared_data_t* shared_data = (shared_data_t*)malloc(sizeof(shared_data_t));
-    condition_t = (pthread_cond_t*) malloc((thread_count * sizeof(pthread_cond_t)));
+    // crear la shared data y las condiciones
+    shared_data_t* shared_data = (shared_data_t*)malloc(sizeof(shared_data_t));
 
-    // crear arreglo de threads y de cada uno de los datos de ese thread
-    pthread_t* threads = (pthread_t*) malloc((thread_count * sizeof(pthread_t)));
-    thread_data_t* thread_info_list = (thread_data_t*) malloc((thread_count * sizeof(thread_info_list)));
+    // inicializar el lock y la condicion
+    pthread_mutex_init(&lock, NULL);
 
-    // inicializar threads y condiciones
-    for(int i=0; i<thread_count; ++i) {
-        thread_info_list[i].thread_num = i;
-        // thread_info_list[i].shared_data = shared_data;
-        pthread_create(&threads[i], NULL, helloWorld, (void*)&thread_info_list[i]);
+    // pedir memoria en heap y hacer spawn de varios threads con su respectiva informacion (thread_data_t)
+    pthread_t* threads = malloc((size_t)(thread_count * sizeof(pthread_t)));
+    thread_data_t* thread_data_list = malloc((size_t)(thread_count * sizeof(thread_data_t)));
+
+    //  crear cada thread con su numero de thread
+    for (int i = 0; i < thread_count; ++i) {
+        thread_data_list[i].thread_num = i;
+        thread_data_list[i].shared_data = shared_data;
+        //printf("Created thread %i\n", i);
+        pthread_create(&threads[i], NULL, helloWorld, (void*)&thread_data_list[i]);
     }
 
-    // esperar a que los threads terminen
-    for(int i=0; i<thread_count; ++i) {
+    for (int i = 0; i < thread_count; ++i) {
         pthread_join(threads[i], NULL);
     }
 
-    // liberar la memoria
-    // free(shared_data);
+    pthread_mutex_destroy(&lock);
+
+    free(shared_data);
     free(threads);
-    free(thread_info_list);
+    free(thread_data_list);
 
     return 0;
 }
