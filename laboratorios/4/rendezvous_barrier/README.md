@@ -12,6 +12,6 @@ Información acerca de si se dan deadlocks o starvation con estos patrones
 Insertar pseudocodigo aqui
 ```
 ### Simulación de la solución al problema. Al ejecutar el programa se puede observar de forma clara lo que ocurre en cada hilo. 
-Se creó el archivo rendezvous_barrier.c en C para demostrar cómo se simula y se ve la solución a estos problemas utilizando pthreads.
+Se creó el archivo `rendezvous_barrier.c` en C para demostrar cómo se simula y se ve la solución a estos problemas utilizando pthreads.
 Para compilar correr `make`.
 
