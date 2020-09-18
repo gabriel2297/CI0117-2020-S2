@@ -1,6 +1,6 @@
 # Laboratorio 4 - Rendezvous y Barrera con Semáforos
 
-## Estudiantes:
+### Estudiantes:
 - Gabriel Umaña Frías (C09913)
 
 ### Descripción del problema / patrón de sincronización.
