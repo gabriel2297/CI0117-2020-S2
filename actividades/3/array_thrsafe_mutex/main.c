@@ -34,13 +34,13 @@ void print_array(const char* name, array_t* array)
 
 void test_arrays(array_t* array1, array_t* array2)
 {
-	printf("Starting to test arrays\n");
 	srand( (unsigned)((unsigned)time(NULL) + (unsigned)clock()) );
 
 	size_t thread_count = 10 + rand() % 20;
 	pthread_t* threads = (pthread_t*) malloc( thread_count * sizeof(pthread_t) );
 	printf("Allocated memory for threads, total threads: %zu\n", thread_count);
-
+	
+	printf("Starting to test arrays\n");
 	for ( size_t current = 0; current < thread_count; ++current )
 		pthread_create( threads + current, NULL, test_array, current % 2 ? array2 : array1 );
 
@@ -54,11 +54,9 @@ void* test_array(void* data)
 {
     array_t* array = (array_t*)data;
 
-	printf("Testing one of the arrays\n");
 	for ( size_t index = 0, count = 1000 + rand() % 10000; index < count; ++index )
 	{
 		size_t num = rand() % 100;
-		printf("The num in this array is %zu\n", num);
 		if ( num >= 10 )
 			array_append( array, (void*)(num) );
 		else
