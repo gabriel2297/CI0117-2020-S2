@@ -44,14 +44,18 @@ Modifique su solución al ejercicio anterior para recibir un argumento adicional
 Modifique el método que calcula el área bajo la curva para que la estimación con los rectángulos sea distribuida entre la cantidad de threads disponible. Asegúrese de no generar fugas de memoria ni condiciones de carrera.
 
 Ejecute los programas de ambos ejericios para *n = 1*, *n = 10*, *n = 1,000* y *n = 1,000,000* (si el hardware lo permite), utilizando los mismos valores de *a* y *b* en cada ejecución. Para el caso del programa que utiliza pthreads, realice ejeciciones usando 1, 16, 32 y 64 hilos.
-Apunte la duración de cada ejecución y asegúrese de obtener las mismas áreas estimadas por la versión serial y concurrente. Agregue los datos de la comparación al archivo .md de este ejercicio, por ej:
+Apunte la duración de cada ejecución y asegúrese de obtener las mismas áreas estimadas por la versión serial y concurrente. Agregue los datos de la comparación al archivo .md de este ejercicio. 
+
+a = 1
+b = 15
 | n | area | serial | 1  | 16 | 32 | 64 |
 |---|---|---|---|---|---|---|
-| 1  |   |   |   |   |   |   |
-| 10  |   |   |   |   |   |   |
-| 1000  |   |   |   |   |   |   |
-| ...  |   |   |   |   |   |   |
-
+| 1  |  28.000000 |  0.000002 |   |   |   |   |
+| 10  | 986.440000  |  0.000003 |   |   |   |   |
+| 1000  | 1137.099124  | 0.000011  |   |   |   |   |
+| 1000000  | 1138.665099  | 0.006601  |   |   |   |   |
+| 1000000000  | 1138.666648  | 5.457817  |   |   |   |   |
+| 1000000000000  | no pudo  | 5 min+ |   |   |   |   |
 
 ### Material de apoyo:
 
