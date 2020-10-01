@@ -46,16 +46,14 @@ Modifique el método que calcula el área bajo la curva para que la estimación 
 Ejecute los programas de ambos ejericios para *n = 1*, *n = 10*, *n = 1,000* y *n = 1,000,000* (si el hardware lo permite), utilizando los mismos valores de *a* y *b* en cada ejecución. Para el caso del programa que utiliza pthreads, realice ejeciciones usando 1, 16, 32 y 64 hilos.
 Apunte la duración de cada ejecución y asegúrese de obtener las mismas áreas estimadas por la versión serial y concurrente. Agregue los datos de la comparación al archivo .md de este ejercicio. 
 
-a = 1
-b = 15
-| n | area | serial | 1  | 16 | 32 | 64 |
-|---|---|---|---|---|---|---|
-| 1  |  28.000000 |  0.000002 |   |   |   |   |
-| 10  | 986.440000  |  0.000003 |   |   |   |   |
-| 1000  | 1137.099124  | 0.000011  |   |   |   |   |
-| 1000000  | 1138.665099  | 0.006601  |   |   |   |   |
-| 1000000000  | 1138.666648  | 5.457817  |   |   |   |   |
-| 1000000000000  | no pudo  | 5 min+ |   |   |   |   |
+| a | b | n | area | serial | 1  | 16 | 32 | 64 |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 15 | 1  |  28.000000 |  0.000002 | 0.000286  | 0.001437  | 0.003328  | 0.005201  |
+| 1 | 15 | 10  | 986.440000  |  0.000003 | 0.000118 | 0.002081  | 0.002934  | 0.007093  |
+| 1 | 15 | 1000  | 1137.099124  | 0.000011  | 0.000301  |   |   |   |
+| 1 | 15 | 1000000  | 1138.665099  | 0.006601  | 0.016304  |   |   |   |
+| 1 | 15 | 1000000000  | 1138.666648  | 5.457817  | 15.087422  |   |   |   |
+| 1 | 15 | 1000000000000  | no pudo  | 5 min+ |   |   |   |   |
 
 ### Material de apoyo:
 
