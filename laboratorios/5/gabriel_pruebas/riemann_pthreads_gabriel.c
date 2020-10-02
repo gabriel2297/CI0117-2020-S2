@@ -3,9 +3,12 @@
 #include <math.h>
 #include <time.h>
 #include <pthread.h>
+#include <unistd.h>
+#include "pthread_barriers.h"
 
 
 pthread_mutex_t mutex;
+pthread_barrier_t barrier;
 
 /* Definicion de una estructura para mantener los datos compartidos entre hilos */
 typedef struct {
@@ -38,21 +41,17 @@ void* riemman_sum(void* data){
     pthread_shared_data* shared_data = pthread_data.shared_data;
     
     double delta = pthread_data.delta;
+    // esperar a los demas hilos para empezar, ya que no queremos cambiar a hasta ese momento
+    pthread_barrier_wait(&barrier);
+    pthread_mutex_lock(&mutex);
     for (size_t i = 0; i < pthread_data.rectangulos; ++i){
-        pthread_mutex_lock(&mutex);
             pthread_data.result += function(shared_data->a) * delta;
-            // printf("pthread[%i] bloqueando escritura de a\n", pthread_data.thread_num);
             shared_data->a += delta;
-        pthread_mutex_unlock(&mutex);
-        // printf("pthread[%i] desbloqueando escritura de a\n", pthread_data.thread_num);
     }
 
     // una vez finalizado sumar los calculos de este hilo al resultado total
-    // printf("pthread[%i] bloqueando escritura de result\n", pthread_data.thread_num);
-    pthread_mutex_lock(&mutex); // bloquear para escritura
-        shared_data->result += pthread_data.result;
+    shared_data->result += pthread_data.result;
     pthread_mutex_unlock(&mutex);
-    // printf("pthread[%i] desbloqueando escritura de result\n", pthread_data.thread_num);
 
     return NULL;
 }
@@ -91,7 +90,7 @@ int main(int argc, char * argv[]){
     pthread_t* threads =  malloc((size_t) (totalThreads * sizeof(pthread_t)) );
     pthread_local_data* local_data = malloc((size_t) (totalThreads * sizeof(pthread_local_data)));
     
-    /* Inicializar el mutex */
+    /* Inicializar el mutex y el barrier*/
     pthread_mutex_init(&mutex, NULL);
     
     /* Empezar a contar */
@@ -142,25 +141,31 @@ int main(int argc, char * argv[]){
         restante_modulo = n - (num_rectangulos_por_hilo*(totalThreads - 1));
     }
 
-    printf("Creando hilos.\n\t- total de hilos a usar: %ld\n\t- num_rectangulos_por_hilo: %ld\n\t- restante_modulo: %ld\n", totalThreads, num_rectangulos_por_hilo, restante_modulo);
+    // printf("Creando hilos.\n\t- total de hilos a usar: %ld\n\t- num_rectangulos_por_hilo: %ld\n\t- restante_modulo: %ld\n", totalThreads, num_rectangulos_por_hilo, restante_modulo);
+    double delta = (shared_data->b - shared_data->a) / n;
+        if (delta < 0){
+            delta = -1 * delta;
+        }
+
+    pthread_barrier_init(&barrier, NULL, totalThreads);
     /* Inicializar cada hilo y pasarle sus datos */
     for(size_t x = 0; x < totalThreads; x++) {
         if (x+1 == totalThreads && impar){
-            local_data[x].delta = (shared_data->b - shared_data->a) / restante_modulo;
+            local_data[x].delta = delta;
             local_data[x].thread_num = x;
             local_data[x].rectangulos = restante_modulo;
             local_data[x].result = 0.0;
             local_data[x].shared_data = shared_data;
         }
         else {
-            local_data[x].delta = (shared_data->b - shared_data->a) / num_rectangulos_por_hilo;
+            local_data[x].delta = delta;
             local_data[x].thread_num = x;
             local_data[x].rectangulos = num_rectangulos_por_hilo;
             local_data[x].result = 0.0;
             local_data[x].shared_data = shared_data;
         }
         // printf("Hilo %li creado con los siguientes datos: \n", x);
-        // printf("\t- rectangulos: %f\n\t- resultado: %f\n", local_data[x].rectangulos, local_data[x].result);
+        // printf("\t- rectangulos: %ld\n\t- delta: %f\n\t- resultado: %f\n", local_data[x].rectangulos, local_data[x].delta, local_data[x].result);
         // printf("\t- shared data:\n\t- a: %f\n\t- b: %f\n\t- resultado: %f\n", local_data[x].shared_data->a, local_data[x].shared_data->b, local_data[x].shared_data->result);
         pthread_create(&threads[x], NULL, riemman_sum, (void*)&local_data[x]);
     }
@@ -181,6 +186,7 @@ int main(int argc, char * argv[]){
     free(shared_data);
     free(local_data);
     pthread_mutex_destroy(&mutex);
+    pthread_barrier_destroy(&barrier);
 
     return 0;
 }
