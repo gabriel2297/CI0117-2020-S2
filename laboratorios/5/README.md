@@ -1,5 +1,9 @@
 # CI0117 - Laboratorio 5
 
+## Estudiantes:
+- Gabriel Umaña Frías (C09913)
+- Emmanuel Zúñiga Chaves (B98729)
+
 ### Instrucciones generales
 
 **Fecha de entrega:** Viernes 2 de Octubre 11:50pm.
