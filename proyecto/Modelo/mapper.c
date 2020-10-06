@@ -1,4 +1,5 @@
 #include "mapper.h"
+#include <stdio.h>
 
 char *get_pokemon_species_name(int id)
 {
@@ -1044,7 +1045,8 @@ void initialize_type_info_list()
     }
 }
 
-void initialize_data() {
+void initialize_data()
+{
     initialize_pokemon_info_list();
     initialize_move_info_list();
     initialize_type_info_list();
