@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <pthread.h>
 #include "../PokemonModel/PokemonModel.h"
 
@@ -22,8 +23,11 @@ typedef struct
 
 void pickPokemonsForPlayer(player_t *player);
 void showPokemonsForPlayer(player_t *player);
-void pickNicknameForPlayer(player_t *player);
+void getPlayerNickname(player_t *player);
 void getPokemonsFromUser(player_t *player);
+void destroyPlayers(player_t *player1, player_t *player2);
+void checkValidPokemon(player_t *player, int position);
+void initPlayers();
 
 void initPlayers()
 {
@@ -71,16 +75,16 @@ void destroyPlayers(player_t *player1, player_t *player2)
  **/
 void pickPokemonsForPlayer(player_t *player)
 {
-    printf("\nElija el numero para el primer pokemon de %s: ", *player->nickname);
-    scanf("%d", &player->playerPokemons[0]->pokemonId);
+    printf("\nElija el numero para el primer pokemon de %s: ", player->nickname);
+    scanf("%zu", &player->playerPokemons[0]->pokemonId);
     checkValidPokemon(player, 0);
     fflush(stdin);
-    printf("\nElija el numero para el segundo pokemon de %s: ", *player->nickname);
-    scanf("%d", &player->playerPokemons[1]->pokemonId);
+    printf("\nElija el numero para el segundo pokemon de %s: ", player->nickname);
+    scanf("%zu", &player->playerPokemons[1]->pokemonId);
     checkValidPokemon(player, 1);
     fflush(stdin);
-    printf("\nElija el numero para el tercer pokemon de %s: ", *player->nickname);
-    scanf("%d", &player->playerPokemons[2]->pokemonId);
+    printf("\nElija el numero para el tercer pokemon de %s: ", player->nickname);
+    scanf("%zu", &player->playerPokemons[2]->pokemonId);
     checkValidPokemon(player, 2);
     fflush(stdin);
 }
@@ -97,7 +101,7 @@ void checkValidPokemon(player_t *player, int position)
         getAvailablePokemonsModel();
         if (player->playerPokemons[position]->pokemonId >= NUM_POKEMONS)
         {
-            printf("\nError, Pokemon %i no existe.\n", (player->playerPokemons[position]->pokemonId) + 1);
+            printf("\nError, Pokemon %lu no existe.\n", (player->playerPokemons[position]->pokemonId) + 1);
             printf("\nElija un numero dentro de la lista de arriba: ");
         }
         else if (position > 0 && (player->playerPokemons[position]->pokemonId == player->playerPokemons[position - 1]->pokemonId))
@@ -109,13 +113,14 @@ void checkValidPokemon(player_t *player, int position)
         {
             break;
         }
-        scanf("%d", &player->playerPokemons[position]->pokemonId);
+        scanf("%zu", &player->playerPokemons[position]->pokemonId);
         fflush(stdin);
     }
 }
 
 void showPokemonsForPlayer(player_t *player)
 {
+    printf("Trying to print something");
     for (int i = 0; i < NUM_POKEMON_PER_PLAYER; ++i)
     {
         printf("\t%i) ", i + 1);
@@ -125,7 +130,7 @@ void showPokemonsForPlayer(player_t *player)
 
 void getPlayerNickname(player_t *player)
 {
-    printf("\nCual es el nombre del jugador 1?");
+    printf("\nCual es el nombre del jugador 1? ");
     scanf("%29s", player->nickname);
     fflush(stdin);
 }
