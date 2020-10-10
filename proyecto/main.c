@@ -63,7 +63,7 @@ void startGame(int *pokemonsAlreadyInitialized)
         initializePokemonsController();
         *pokemonsAlreadyInitialized = 1;
     }
-    printf("Pokemones disponibles: \n");
+    printf("Pokemones disponibles: \n");    
     showAvailablePokemonsController();
     pickPokemonsController();
 }
