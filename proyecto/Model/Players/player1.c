@@ -47,7 +47,7 @@ void pickPokemonsPlayer1()
     fflush(stdin);
     while (1)
     {
-        if (pokemonList[1] == pokemonList[2])
+        if (pokemonList[1] == pokemonList[2] || pokemonList[0] == pokemonList[2])
         {
             printf("\e[1;1H\e[2J");
             getAvailablePokemonsModel();
