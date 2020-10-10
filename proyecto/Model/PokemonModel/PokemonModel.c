@@ -1,7 +1,7 @@
 #include "../mapper.h"
 #include <stdio.h>
 
-void getAvailablePokemonModel()
+void getAvailablePokemonsModel()
 {
     for (int i = 0; i < NUM_POKEMON; i += 2)
     {
