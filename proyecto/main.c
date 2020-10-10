@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "Controlador/controlador.h"
+#include "Controller/PokemonsController/PokemonController.h"
 
 void startGame();
 
@@ -10,6 +10,20 @@ int main(int argc, char *argv[])
     int pokemonsAlreadyInitialized = 0;
     // inicia el juego, vamos a preguntarle al usuario si quiere jugar o si quiere salir
     char response[2];
+    printf(" ####    ###   #   #  #####  #   #   ###   #   #          ###    ###   \n");
+    printf(" #   #  #   #  #  #   #      #   #  #   #  #   #         #   #  #   #  \n");
+    printf(" #   #  #   #  # #    #      ## ##  #   #  ##  #         #      #   #  \n");
+    printf(" ####   #   #  ##     ####   # # #  #   #  # # #         #      #   #  \n");
+    printf(" #      #   #  # #    #      #   #  #   #  #  ##         #  ##  #   #  \n");
+    printf(" #      #   #  #  #   #      #   #  #   #  #   #         #   #  #   #  \n");
+    printf(" #       ###   #   #  #####  #   #   ###   #   #          ###    ###   \n\n\n");
+    printf("  ###    ###   #   #  #   #  #        #    #####   ###   ####  \n");
+    printf(" #   #    #    #   #  #   #  #       # #     #    #   #  #   # \n");
+    printf(" #        #    ## ##  #   #  #      #   #    #    #   #  #   # \n");
+    printf("  ###     #    # # #  #   #  #      #   #    #    #   #  ####  \n");
+    printf("     #    #    #   #  #   #  #      #####    #    #   #  # #   \n");
+    printf(" #   #    #    #   #  #   #  #      #   #    #    #   #  #  #  \n");
+    printf("  ###    ###   #   #   ###   #####  #   #    #     ###   #   # \n\n\n");
     printf("Bienvenido a la simulacion de Pokemon! Desea jugar (y) o salir (n)? (y/n): ");
     do
     {
@@ -20,10 +34,12 @@ int main(int argc, char *argv[])
             printf("\e[1;1H\e[2J");
             printf("Eligio \"%c\", continuando\n", response[0]);
             startGame(&pokemonsAlreadyInitialized);
-            printf("Desea jugar de nuevo (y) o salir (n)? (y/n): ");
+            //printf("\e[1;1H\e[2J");
+            printf("\n\nPartida finalizada! Desea jugar de nuevo (y) o salir (n)? (y/n): ");
         }
         else if (strcmp("n", &response[0]) == 0)
         {
+            printf("\e[1;1H\e[2J");
             printf("Eligio \"%c\". Gracias por jugar.. Adiós!\n", response[0]);
             exit(0);
         }
@@ -48,5 +64,5 @@ void startGame(int *pokemonsAlreadyInitialized)
     }
     printf("Pokemones disponibles: \n");
     showAvailablePokemonsController();
-    printf("Juego terminado!\n");
+    pickPokemonsController();
 }
