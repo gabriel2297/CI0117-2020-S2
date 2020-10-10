@@ -21,5 +21,5 @@ void initializePokemonModel()
 
 void printPokemonNameById(int id)
 {
-    printf("\t- %s\n", get_pokemon_species_name(id));
+    printf("%s\n", get_pokemon_species_name(id));
 }

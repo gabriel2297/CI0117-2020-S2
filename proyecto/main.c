@@ -7,6 +7,7 @@ void startGame();
 
 int main(int argc, char *argv[])
 {
+    printf("\e[1;1H\e[2J");
     int pokemonsAlreadyInitialized = 0;
     // inicia el juego, vamos a preguntarle al usuario si quiere jugar o si quiere salir
     char response[2];
