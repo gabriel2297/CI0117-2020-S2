@@ -13,5 +13,5 @@ void initializePokemonsController()
 
 void pickPokemonsController()
 {
-    initPlayer1();
+    initPlayers();
 }

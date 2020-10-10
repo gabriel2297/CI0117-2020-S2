@@ -33,7 +33,7 @@ void getPokemonFromUser(int position, char *pokemonArray, char *pokemonNumber, c
             printf("\e[1;1H\e[2J");
             getAvailablePokemonsModel();
             printf("\nError, Pokemon %i no existe.\n", pokemonList[position]);
-            printf("\nElija el numero para el &s pokemon de %s: ", pokemonNumber, nickname);
+            printf("\nElija el numero para el %s pokemon de %s: ", pokemonNumber, nickname);
             scanf("%d", &pokemonList[1]);
             pokemonList[1] -= 1;
             fflush(stdin);
