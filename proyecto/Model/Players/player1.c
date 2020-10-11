@@ -11,14 +11,13 @@ typedef struct
 {
     size_t threadId;
     size_t pokemonId;
-    pthread_t pokemon;
 } pokemon_threadInfo_t;
 
 typedef struct
 {
     size_t playerId;
     char nickname[MAX_CHARS_PLAYER_NICKNAME];
-    pokemon_threadInfo_t *playerPokemons[];
+    pokemon_threadInfo_t *playerPokemons[NUM_POKEMON_PER_PLAYER];
 } player_t;
 
 void pickPokemonsForPlayer(player_t *player);
@@ -31,16 +30,16 @@ void initPlayers();
 
 void initPlayers()
 {
-
     // crear los jugadores
-    player_t *player1 = (player_t *)malloc((size_t)sizeof(player_t));
-    player_t *player2 = (player_t *)malloc((size_t)sizeof(player_t));
+    player_t *player1 = (player_t *)malloc(sizeof(player_t));
+    player_t *player2 = (player_t *)malloc(sizeof(player_t));
     player1->playerId = 1;
     player2->playerId = 2;
-    for (int i = 0; i < NUM_POKEMON_PER_PLAYER; ++i)
+    for (int i = 0; i < NUM_POKEMON_PER_PLAYER; i++)
     {
-        player1->playerPokemons[i] = (pokemon_threadInfo_t *)malloc((size_t)sizeof(pokemon_threadInfo_t));
-        player2->playerPokemons[i] = (pokemon_threadInfo_t *)malloc((size_t)sizeof(pokemon_threadInfo_t));
+        printf("Agregando %i a los jugadores\n", i);
+        player1->playerPokemons[i] = (pokemon_threadInfo_t *)malloc(sizeof(pokemon_threadInfo_t));
+        player2->playerPokemons[i] = (pokemon_threadInfo_t *)malloc(sizeof(pokemon_threadInfo_t));
     }
 
     // obtener la informacion de los jugadoes
@@ -56,6 +55,8 @@ void initPlayers()
     destroyPlayers(player1, player2);
 }
 
+/**
+ * Los jugadores y los pokemones 
 void destroyPlayers(player_t *player1, player_t *player2)
 {
     for (int i = 0; i < NUM_POKEMON_PER_PLAYER; ++i)
@@ -87,6 +88,9 @@ void pickPokemonsForPlayer(player_t *player)
     scanf("%zu", &player->playerPokemons[2]->pokemonId);
     checkValidPokemon(player, 2);
     fflush(stdin);
+    player->playerPokemons[0]->pokemonId--;
+    player->playerPokemons[1]->pokemonId--;
+    player->playerPokemons[2]->pokemonId--;
 }
 
 /**
@@ -120,7 +124,7 @@ void checkValidPokemon(player_t *player, int position)
 
 void showPokemonsForPlayer(player_t *player)
 {
-    printf("Trying to print something");
+    printf("Trying to print something\n");
     for (int i = 0; i < NUM_POKEMON_PER_PLAYER; ++i)
     {
         printf("\t%i) ", i + 1);
@@ -130,7 +134,7 @@ void showPokemonsForPlayer(player_t *player)
 
 void getPlayerNickname(player_t *player)
 {
-    printf("\nCual es el nombre del jugador 1? ");
+    printf("\nCual es el nombre del jugador? ");
     scanf("%29s", player->nickname);
     fflush(stdin);
 }
