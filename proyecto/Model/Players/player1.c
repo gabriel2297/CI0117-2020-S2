@@ -37,7 +37,6 @@ void initPlayers()
     player2->playerId = 2;
     for (int i = 0; i < NUM_POKEMON_PER_PLAYER; i++)
     {
-        printf("Agregando %i a los jugadores\n", i);
         player1->playerPokemons[i] = (pokemon_threadInfo_t *)malloc(sizeof(pokemon_threadInfo_t));
         player2->playerPokemons[i] = (pokemon_threadInfo_t *)malloc(sizeof(pokemon_threadInfo_t));
     }
@@ -56,7 +55,10 @@ void initPlayers()
 }
 
 /**
- * Los jugadores y los pokemones 
+ * Los jugadores y los pokemones piden memoria por lo que hay que liberarla
+ * @param player1 - puntero al jugador 1
+ * @param player2 - puntero al jugador 2
+ * */
 void destroyPlayers(player_t *player1, player_t *player2)
 {
     for (int i = 0; i < NUM_POKEMON_PER_PLAYER; ++i)
@@ -124,12 +126,13 @@ void checkValidPokemon(player_t *player, int position)
 
 void showPokemonsForPlayer(player_t *player)
 {
-    printf("Trying to print something\n");
+    printf("Mostrando pokemones elegidos por %s:\n", player->nickname);
     for (int i = 0; i < NUM_POKEMON_PER_PLAYER; ++i)
     {
         printf("\t%i) ", i + 1);
         printPokemonNameById(player->playerPokemons[i]->pokemonId);
     }
+    printf("\n");
 }
 
 void getPlayerNickname(player_t *player)
