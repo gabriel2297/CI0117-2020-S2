@@ -32,7 +32,7 @@ void getPokemonNumbersFromUser(player_t *player, int position)
     {
         fflush(stdin);
         scanf("%i", &pokemonId);
-        if (pokemonId > NUM_POKEMON)
+        if (pokemonId > NUM_POKEMON || pokemonId <= 0)
         {
             printf("\nError, Pokemon %i no existe.\n", pokemonId);
             printf("\nElija un numero dentro de la lista de arriba: ");
