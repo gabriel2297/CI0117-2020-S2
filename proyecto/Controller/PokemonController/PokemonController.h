@@ -11,6 +11,6 @@ typedef struct
 
 void initializePokemon(pokemon_t *pokemon, int pokemonId);
 void showAvailablePokemons();
-void liberarMemoriaPokemonInfo(pokemon_t *pokemon);
+void liberarMemoriaPokemonInfo(pokemon_info_t *pokemon_info);
 
 #endif

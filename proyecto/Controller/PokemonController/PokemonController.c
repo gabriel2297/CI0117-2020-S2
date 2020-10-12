@@ -6,15 +6,11 @@ void initializePokemon(pokemon_t *pokemon, int pokemonId)
 {
     pokemon->hp = 1500;
     pokemon->pokemon_info = (pokemon_info_t *)malloc(sizeof(pokemon_info_t));
+    pokemon->pokemon_info->id = pokemonId;
     pokemon->pokemon_info->chargedMoveId = get_pokemon_charged_move_id(pokemonId);
     pokemon->pokemon_info->fastMoveId = get_pokemon_fast_move_id(pokemonId);
     pokemon->pokemon_info->speciesName = get_pokemon_species_name(pokemonId);
     pokemon->pokemon_info->typeId = get_pokemon_type_id(pokemonId);
-}
-
-void liberarMemoriaPokemonInfo(pokemon_t *pokemon)
-{
-    free(pokemon->pokemon_info);
 }
 
 void showAvailablePokemons()
