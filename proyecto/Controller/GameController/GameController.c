@@ -28,29 +28,29 @@ void startGame()
     showPlayerInformation(player1);
     showPlayerInformation(player2);
 
-    // crear los hilos que van a ser los pokemones y enviarles los datos del jugador
-    pthread_t *player1Threads = malloc((size_t)(MAX_POKEMONS_PER_PLAYER * sizeof(pthread_t)));
-    pthread_t *player2Threads = malloc((size_t)(MAX_POKEMONS_PER_PLAYER * sizeof(pthread_t)));
+    // // crear los hilos que van a ser los pokemones y enviarles los datos del jugador
+    // pthread_t *player1Threads = malloc((size_t)(MAX_POKEMONS_PER_PLAYER * sizeof(pthread_t)));
+    // pthread_t *player2Threads = malloc((size_t)(MAX_POKEMONS_PER_PLAYER * sizeof(pthread_t)));
 
-    // creo que esto se podria realizar de mejor manera ya que estamos pasando solo la informacion del pokemon y no todo el
-    // jugador, pero veremos luego
-    for (size_t i = 0; i < MAX_POKEMONS_PER_PLAYER; ++i)
-    {
-        pthread_create(player1Threads[i], NULL, placeholder, (void *)&player1->playerPokemons[i]);
-        pthread_create(player2Threads[i], NULL, placeholder, (void *)&player1->playerPokemons[i]);
-    }
+    // // creo que esto se podria realizar de mejor manera ya que estamos pasando solo la informacion del pokemon y no todo el
+    // // jugador, pero veremos luego
+    // for (size_t i = 0; i < MAX_POKEMONS_PER_PLAYER; ++i)
+    // {
+    //     pthread_create(player1Threads[i], NULL, placeholder, (void *)&player1->playerPokemons[i]);
+    //     pthread_create(player2Threads[i], NULL, placeholder, (void *)&player2->playerPokemons[i]);
+    // }
 
-    for (size_t i = 0; i < MAX_POKEMONS_PER_PLAYER; ++i)
-    {
-        pthread_join(&player1[i], NULL);
-        pthread_join(&player2[i], NULL);
-    }
+    // for (size_t i = 0; i < MAX_POKEMONS_PER_PLAYER; ++i)
+    // {
+    //     pthread_join(&player1[i], NULL);
+    //     pthread_join(&player2[i], NULL);
+    // }
 
     // finalizar juego (liberar memoria, etc)
     destroyPlayer(player1);
     destroyPlayer(player2);
 }
 
-void *placeholder(void *args)
-{
-}
+// void *placeholder(void *args)
+// {
+// }
