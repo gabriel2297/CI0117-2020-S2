@@ -63,7 +63,6 @@ void initializePlayer(player_t *player)
     for (int i = 0; i < MAX_POKEMONS_PER_PLAYER; ++i)
     {
         player->playerPokemons[i] = (pokemon_t *)malloc(sizeof(pokemon_t));
-        player->playerPokemons[i]->thread_id = i;
         getPokemonNumbersFromUser(player, i);
     }
 }

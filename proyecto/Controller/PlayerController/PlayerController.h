@@ -1,7 +1,6 @@
 #ifndef PLAYERCONTROLLER_H_
 #define PLAYERCONTROLLER_H_
 
-#include "../../Model/mapper.h"
 #include "../PokemonController/PokemonController.h"
 
 #define MAX_POKEMONS_PER_PLAYER 3
