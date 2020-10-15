@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include <time.h>
 #include "BattleController.h"
 
 typedef struct
@@ -45,20 +44,27 @@ void *fight(void *args)
     pthread_barrier_wait(&shared_data->barrier);
     printf("thread[%zu] - jugador %s uso %s\n", local_data->thread_num, local_data->player->nickname, local_data->pokemon->pokemon_info->speciesName);
 
-    // Mientras la vida del pokemon sea mayor a 0
+    // pthread_mutex_lock(&shared_data->mutex);
+    // // voy a revisar si es mi turno. Los pokemones se crean de manera secuencial, a como se ingresaron en el arreglo
+    // // (como los especifico el usuario), entonces el numero de hilo debe ser igual al numero del pokemon que esta compitieno.
+    // if (local_data->thread_num == shared_data->player1_turn)
+    // {
+    //     // no es mi turno, dormir
+    //     pthread_cond_wait(&shared_data->condition, &shared_data->mutex);
+    // }
+
+    // si llegamos hasta aqui es porque ya es mi turno, empezar a contar cuanto duro en la batalla
+    local_data->pokemon->start_time = clock();
+
+    // //Mientras la vida del pokemon sea mayor a 0
     // while (local_data->pokemon->hp > 0)
     // {
-    //     pthread_mutex_lock(&shared_data->mutex);
-    //     // voy a revisar si es mi turno. Los pokemones se crean de manera secuencial, a como se ingresaron en el arreglo
-    //     // (como los especifico el usuario), entonces el numero de hilo debe ser igual al numero del pokemon que esta compitieno.
-    //     if (local_data->thread_num == shared_data->player1_turn)
-    //     {
-    //         // no es mi turno, dormir
-    //         pthread_cond_wait(&shared_data->condition, &shared_data->mutex);
-    //     }
     // }
-    // // pokemon murio, aumentar el contador y soltar el mutex
+    // pokemon murio, aumentar el contador y soltar el mutex
     // pthread_mutex_unlock(&shared_data->mutex);
+
+    // actualizar cualquier otra informacion
+    local_data->pokemon->end_time = clock();
 
     return NULL;
 }
@@ -115,6 +121,11 @@ void initBattle(player_t *player1, player_t *player2)
     shared_battle_data->end_time = clock();
     double execution_time = (double)(shared_battle_data->end_time - shared_battle_data->start_time) / CLOCKS_PER_SEC;
     printf("Duracion de la batalla: %f segundos\n", execution_time);
+    // for (int i = 0; i < (MAX_POKEMONS_PER_PLAYER * 2); ++i)
+    // {
+    //     printf("\t- Pokemon %s del jugador %s duro %f en la batalla\n", player1->playerPokemons[i]->pokemon_info->speciesName, player1->nickname, ((player1->playerPokemons[i]->end_time - player1->playerPokemons[i]->end_time) / CLOCKS_PER_SEC));
+    //     printf("\t- Pokemon %s del jugador %s duro %f en la batalla\n", player2->playerPokemons[i]->pokemon_info->speciesName, player2->nickname, ((player2->playerPokemons[i]->end_time - player2->playerPokemons[i]->end_time) / CLOCKS_PER_SEC));
+    // }
 
     // liberar datos
     pthread_mutex_destroy(&shared_battle_data->mutex);
