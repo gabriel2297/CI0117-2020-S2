@@ -1,2 +1,2 @@
 compile: main.c
-	gcc -O0 -g -lm -o pokemon Model/mapper.c Controller/GameController/GameController.c Controller/PlayerController/PlayerController.c Controller/PokemonController/PokemonController.c main.c -pthread
+	gcc -O0 -g -lm -o pokemon Model/mapper.c Controller/GameController/GameController.c Controller/PlayerController/PlayerController.c Controller/BattleController/BattleController.c Controller/PokemonController/PokemonController.c main.c -pthread
