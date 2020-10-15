@@ -1,5 +1,9 @@
 # CI0117 - Proyecto 1: Simulador de Batallas de Hilos [pthreadmon]
 
+## Estudiantes:
+- Gabriel Umaña Frías (C09913)
+- Emmanuel Zúñiga Chaves (B98729)
+
 ### Instrucciones generales
 
 **Fecha de entrega:** Jueves 22 de Octubre 11:50pm.
