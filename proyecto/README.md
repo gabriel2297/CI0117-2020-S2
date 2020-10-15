@@ -8,6 +8,8 @@
 
 **Fecha de entrega:** Jueves 22 de Octubre 11:50pm.
 
+Documentacion: https://docs.google.com/document/d/1dM8PhhUtUgoC3fvzHUtbR7yTBtp3Xi9LXAMns4Mfibg/edit?usp=sharing
+
 ### Introducción
 
 El propósito de este proyecto es implementar un simulador de batallas entre hilos basándose en la dinámica de batallas PvP del juego [Pokémon GO](https://es.wikipedia.org/wiki/Pok%C3%A9mon_GO). En estas batallas dos jugadores se enfrentan utilizando 3 Pokémon cada uno, donde cada Pokémon tiene ataques y características específicas (ataques rápidos, ataques cargados, puntos de vida, entre otros). Un enfrentamiento entre dos Pokémon consiste en ambos atacando simultáneamente al otro hasta que uno de los dos se debilite (sus puntos de vida llegan a 0). El objetivo de cada jugador es lograr debilitar a los 3 Pokémon de su oponente antes de que el oponente debilite los suyos. Puede ver un ejemplo de cómo funcionan las batallas en [este video](https://youtu.be/oTUbkfzHm4Q).
