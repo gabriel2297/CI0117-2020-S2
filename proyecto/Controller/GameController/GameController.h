@@ -3,6 +3,7 @@
 
 #include "../../Model/mapper.h"
 #include "../PlayerController/PlayerController.h"
+#include "../BattleController/BattleController.h"
 
 void startGame();
 
