@@ -16,11 +16,13 @@ void startGame()
     // instanciar el jugador 1, ponerle nombre y mostrar su informacion
     player_t *player1 = (player_t *)malloc(sizeof(player_t));
     player1->playerId = 1;
+    player1->turn = 0;
     initializePlayer(player1);
 
     // instanciar el jugador 2, ponerle nombre y mostrar su informacion
     player_t *player2 = (player_t *)malloc(sizeof(player_t));
     player2->playerId = 2;
+    player2->turn = 0;
     initializePlayer(player2);
 
     // mostrar la informacion de los jugadores
