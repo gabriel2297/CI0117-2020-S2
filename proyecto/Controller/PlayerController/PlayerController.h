@@ -9,10 +9,11 @@
 typedef struct
 {
     int playerId;
-    int turn;
+    size_t pokemonTurn;
     char nickname[MAX_CHARS_PLAYER_NICKNAME];
     pokemon_t *playerPokemons[MAX_POKEMONS_PER_PLAYER];
     pthread_cond_t *condition;
+    pthread_mutex_t mutex;
 } player_t;
 
 void initializePlayer(player_t *player);

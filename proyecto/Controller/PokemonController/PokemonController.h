@@ -9,7 +9,7 @@ typedef struct
     clock_t start_time;
     clock_t end_time;
     pokemon_info_t *pokemon_info;
-    int hp;
+    size_t hp;
 } pokemon_t;
 
 void initializePokemon(pokemon_t *pokemon, int pokemonId);
