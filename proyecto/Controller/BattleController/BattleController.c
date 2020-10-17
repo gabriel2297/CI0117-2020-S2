@@ -5,9 +5,6 @@
 
 typedef struct
 {
-    size_t isStartTimeSet;
-    clock_t start_time;
-    clock_t end_time;
     pthread_mutex_t mutex;
     pthread_barrier_t barrier;
 } battle_data_t;
@@ -27,16 +24,7 @@ void *fight(void *args)
     player_data_t *local_data = (player_data_t *)args;
     battle_data_t *shared_data = local_data->battle_data;
 
-    // bloquear el mutex general y empezar el contador
-    pthread_mutex_lock(&local_data->battle_data->mutex);
-    if (!local_data->battle_data->isStartTimeSet)
-    {
-        local_data->battle_data->start_time = clock();
-        local_data->battle_data->isStartTimeSet = 1;
-    }
-    pthread_mutex_unlock(&local_data->battle_data->mutex);
-
-    // ahora esperar en la barrera a que lleguen todos los hilos para asi empezar la batalla
+    // esperar en la barrera a que lleguen todos los hilos para asi empezar la batalla
     pthread_barrier_wait(&local_data->battle_data->barrier);
 
     // revisar si es turno de este hilo. Los pokemones se crean de manera secuencial, a como se ingresaron en el arreglo
@@ -51,14 +39,16 @@ void *fight(void *args)
     // si llegamos hasta aqui es porque ya es turno de este hilo, empezar a contar cuanto dura en la batalla
     local_data->pokemon->start_time = clock();
 
+    // imprimir para probar que funciona hasta aca
+    printf("Hola desde hilo %zu - Pokemon %s\n", local_data->thread_num, local_data->pokemon->pokemon_info->speciesName);
     //Mientras la vida del pokemon sea mayor a 0
-    while (local_data->pokemon->hp > 0)
-    {
-        // utilizar un semaforo para decidir quien sigue atacando (similar al problema del productor/consumidor)
-        // agarrar el mutex para atacar
-        // liberar el mutex para atacar
-        // hacer el post
-    }
+    // while (local_data->pokemon->hp > 0)
+    // {
+    //     // utilizar un semaforo para decidir quien sigue atacando (similar al problema del productor/consumidor)
+    //     // agarrar el mutex para atacar
+    //     // liberar el mutex para atacar
+    //     // hacer el post
+    // }
 
     //pokemon murio, aumentar el contador, soltar el mutex, despertar al siguiente hilo y guardar cuando el hilo finalizo
     ++local_data->player->turn;
@@ -77,7 +67,6 @@ void initBattle(player_t *player1, player_t *player2)
 
     // crear los datos compartidos por los hilos
     battle_data_t *shared_battle_data = (battle_data_t *)malloc((MAX_POKEMONS_PER_PLAYER * 2) * sizeof(battle_data_t));
-    shared_battle_data->isStartTimeSet = 0;
 
     // inicializar los metodos de sincronizacion
     pthread_mutex_init(&shared_battle_data->mutex, NULL);
@@ -88,6 +77,7 @@ void initBattle(player_t *player1, player_t *player2)
     player_data_t *player2_data = (player_data_t *)malloc(MAX_POKEMONS_PER_PLAYER * sizeof(player_data_t));
 
     // inicializar los hilos
+    clock_t start_time = clock();
     for (size_t i = 0; i < MAX_POKEMONS_PER_PLAYER; ++i)
     {
         // inicializar la variable de condicion para cada hilo
@@ -118,8 +108,8 @@ void initBattle(player_t *player1, player_t *player2)
     }
 
     // parar el tiempo y calcular el tiempo que tardo la batalla, aprovechar para destruir las variables de condicion
-    shared_battle_data->end_time = clock();
-    double execution_time = (double)(shared_battle_data->end_time - shared_battle_data->start_time) / CLOCKS_PER_SEC;
+    clock_t end_time = clock();
+    double execution_time = (double)(end_time - start_time) / CLOCKS_PER_SEC;
     printf("Duracion de la batalla: %f segundos\n", execution_time);
     for (int i = 0; i < (MAX_POKEMONS_PER_PLAYER * 2); ++i)
     {
