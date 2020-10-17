@@ -33,43 +33,66 @@ void *fight(void *args)
     pthread_barrier_wait(&shared_data->barrier);
 
     // obtener el mutex local para ver si es el turno de este pokemon, sino dormir y esperar
-    pthread_mutex_lock(&player->mutex);
+    pthread_mutex_lock(&shared_data->mutex);
     if (thread_num != player->pokemonTurn)
     {
-        pthread_cond_wait(&player->condition[thread_num], &player->mutex);
+        pthread_cond_wait(&player->condition[thread_num], &shared_data->mutex);
     }
-    pthread_mutex_unlock(&player->mutex);
-    printf("Player[%zu] - Thread[%zu] - Pokemon[%s] jugando\n", player->playerId, thread_num, pokemon->pokemon_info->speciesName);
+    else 
+    {
+        pthread_mutex_unlock(&shared_data->mutex);   
+    }
+
+    printf("Player[%u] - Thread[%zu] - Pokemon[%s] jugando\n", player->playerId, thread_num, pokemon->pokemon_info->speciesName);
     pokemon->start_time = clock();
+
     while (1)
     {
         // obtener el mutex global y local para revisar si es nuestro turno de atacar y si tenemos suficiente vida para hacerlo
+        printf("Player[%u] - Thread[%zu] - Pokemon[%s] intentanto adquirir el shared_data lock\n", player->playerId, thread_num, pokemon->pokemon_info->speciesName);
         pthread_mutex_lock(&shared_data->mutex);
-        if (player->playerId == shared_data->playerTurn && pokemon->hp > 0)
+        printf("Player[%u] - Thread[%zu] - Pokemon[%s] tomo el shared_data lock, es turno de [%zu]\n", player->playerId, thread_num, pokemon->pokemon_info->speciesName, shared_data->playerTurn);
+        if (player->playerId == shared_data->playerTurn)
         {
-            pthread_mutex_lock(&player->mutex);
+            //pthread_mutex_lock(&player->mutex);
+            printf("Player[%u] - Thread[%zu] - Pokemon[%s] tomo el mutex player\n", player->playerId, thread_num, pokemon->pokemon_info->speciesName);
             if (pokemon->hp <= 0)
             {
                 // no tengo suficiente vida, salir
-                pthread_mutex_unlock(&player->mutex);
+                pthread_mutex_unlock(&shared_data->mutex);
+                printf("Player[%u] - Thread[%zu] - Pokemon[%s] desbloqueo el mutex shared_data\n", player->playerId, thread_num, pokemon->pokemon_info->speciesName);
                 break;
             }
-            printf("Player[%zu] - Thread[%zu] - Pokemon[%s] atacando\n", player->playerId, thread_num, pokemon->pokemon_info->speciesName);
-            pthread_mutex_lock(&opponent->mutex);
+            printf("Player[%u] - Thread[%zu] - Pokemon[%s] atacando\n", player->playerId, thread_num, pokemon->pokemon_info->speciesName);
+            //pthread_mutex_lock(&opponent->mutex);
+            printf("Player[%u] - Thread[%zu] - Pokemon[%s] tomo el mutex opponent\n", player->playerId, thread_num, pokemon->pokemon_info->speciesName);
             opponent->playerPokemons[opponent->pokemonTurn]->hp = opponent->playerPokemons[opponent->pokemonTurn]->hp - 500;
+            printf("La vida de %s ahora es %zu\n", opponent->playerPokemons[opponent->pokemonTurn]->pokemon_info->speciesName, opponent->playerPokemons[opponent->pokemonTurn]->hp);
             shared_data->playerTurn = opponent->playerId;
-            pthread_mutex_unlock(&opponent->mutex);
-            pthread_mutex_unlock(&player->mutex);
+            printf("Player[%u] - Thread[%zu] - Pokemon[%s] paso el turno a [%zu]\n", player->playerId, thread_num, pokemon->pokemon_info->speciesName, shared_data->playerTurn);
+            //pthread_mutex_unlock(&opponent->mutex);
+            printf("Player[%u] - Thread[%zu] - Pokemon[%s] desbloqueo el mutex opponent\n", player->playerId, thread_num, pokemon->pokemon_info->speciesName);
+            //pthread_mutex_unlock(&player->mutex);
+            printf("Player[%u] - Thread[%zu] - Pokemon[%s] besbloqueo el mutex player\n", player->playerId, thread_num, pokemon->pokemon_info->speciesName);
+            //pthread_mutex_unlock(&shared_data->mutex);
+            pthread_cond_signal(&opponent->condition[opponent->pokemonTurn]);
+            printf("Player[%u] - Thread[%zu] - Pokemon[%s] desperto al oponente[%zu] y va a esperar\n", player->playerId, thread_num, pokemon->pokemon_info->speciesName, opponent->pokemonTurn);
+            pthread_cond_wait(&player->condition[thread_num], &shared_data->mutex);
         }
-        pthread_mutex_unlock(&shared_data->mutex);
+        else 
+        {
+            printf("Player[%u] - Thread[%zu] - Pokemon[%s] aun no es mi turno, soltando el mutex shared_data\n", player->playerId, thread_num, pokemon->pokemon_info->speciesName);
+            //pthread_mutex_unlock(&shared_data->mutex);
+            pthread_cond_wait(&player->condition[thread_num], &shared_data->mutex);
+        }
     }
 
     // pokemon murio, decirle al siguiente pokemon que se despierte o si somos el ultimo entonces salir
-    pthread_mutex_lock(&player->mutex);
-    printf("Player[%zu] - Thread[%zu] - Pokemon[%s] murio\n", player->playerId, thread_num, pokemon->pokemon_info->speciesName);
-    ++player->pokemonTurn;
+    printf("Player[%u] - Thread[%zu] - Pokemon[%s] murio\n", player->playerId, thread_num, pokemon->pokemon_info->speciesName);
+    ++player->pokemonTurn;    
     if (!player->pokemonTurn >= MAX_POKEMONS_PER_PLAYER)
     {
+        printf("Player[%u] - Thread[%zu] - Pokemon[%s] despertando a Thread[%zu] - Pokemon[%s]\n", player->playerId, thread_num, pokemon->pokemon_info->speciesName, player->pokemonTurn, player->playerPokemons[player->pokemonTurn]->pokemon_info->speciesName);
         pthread_cond_signal(&player->condition[player->pokemonTurn]);
     }
     pthread_mutex_unlock(&player->mutex);
