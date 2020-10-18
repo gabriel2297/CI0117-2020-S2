@@ -20,7 +20,10 @@ void startGame()
     player1->condition = (pthread_cond_t *)malloc(sizeof(pthread_cond_t) * MAX_POKEMONS_PER_PLAYER);
     player1->playerId = 1;
     player1->pokemonTurn = 0;
-    pthread_mutex_init(&player1->mutex, NULL);
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutex_init(&player1->mutex, &attr);
     initializePlayer(player1);
 
     // instanciar el jugador 2, ponerle nombre y mostrar su informacion
@@ -28,7 +31,7 @@ void startGame()
     player2->condition = (pthread_cond_t *)malloc(sizeof(pthread_cond_t) * MAX_POKEMONS_PER_PLAYER);
     player2->playerId = 2;
     player2->pokemonTurn = 0;
-    pthread_mutex_init(&player2->mutex, NULL);    
+    pthread_mutex_init(&player2->mutex, &attr);    
     initializePlayer(player2);
 
     // mostrar la informacion de los jugadores

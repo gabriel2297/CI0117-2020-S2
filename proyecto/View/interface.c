@@ -1,7 +1,7 @@
 #include <gtk/gtk.h>
 #include <stdio.h>
-#include "Controller/GameController/GameController.h"
-#include "Controller/PlayerController/PlayerController.h"
+#include "../Controller/GameController/GameController.h"
+#include "../Controller/PlayerController/PlayerController.h"
 GtkWidget * image;
 GtkWidget * image2;
 GtkWidget * button_box; 
@@ -25,7 +25,7 @@ static void my_callback(GObject *source_object, GAsyncResult *res, gpointer user
 void on_name_entry_chaged(GtkEntry * text_entry, gpointer data){
     char * entry;
     g_print(" %s\n", gtk_entry_get_text(GTK_ENTRY(text_entry)));
-    setName((char *)gtk_entry_get_text(GTK_ENTRY(text_entry)));
+    // setName((char *)gtk_entry_get_text(GTK_ENTRY(text_entry)));
 }
 
 
