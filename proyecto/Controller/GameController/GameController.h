@@ -5,6 +5,6 @@
 #include "../PlayerController/PlayerController.h"
 #include "../BattleController/BattleController.h"
 
-void startGame();
+void startGame(int id_matrix[2][3]);
 
 #endif

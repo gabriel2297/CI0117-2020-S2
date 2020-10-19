@@ -47,6 +47,8 @@ void *fight(void *args)
 
     pokemon->start_time = time(NULL);
 
+    setPokemonName(player->playerId,pokemon->pokemon_info->speciesName);
+    
     while (1)
     {
         if (player->playerId == shared_data->playerTurn)

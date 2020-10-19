@@ -18,5 +18,5 @@ typedef struct
 void initializePlayer(player_t *player);
 void showPlayerInformation(player_t *player);
 void liberarMemoriaJugador(player_t *player);
-
+void set_pokemon_player(player_t * player, int position, int pokemonId);
 #endif

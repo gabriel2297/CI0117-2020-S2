@@ -11,7 +11,12 @@ void showPlayerInformation(player_t *player)
     }
 }
 
-void getPokemonNumbersFromUser(player_t *player, int position)
+void set_pokemon_player(player_t * player, int position, int pokemonId)
+{
+    initializePokemon(player->playerPokemons[position], pokemonId);
+
+}
+/* void getPokemonNumbersFromUser(int player_id, int position)
 {
     printf("\e[1;1H\e[2J");
     showAvailablePokemons();
@@ -52,17 +57,17 @@ void getPokemonNumbersFromUser(player_t *player, int position)
     initializePokemon(player->playerPokemons[position], pokemonId);
     printf("\n");
 }
-
+ */
 void initializePlayer(player_t *player)
 {
-    printf("\nCual es el nombre del jugador? ");
+   /*  printf("\nCual es el nombre del jugador? ");
     scanf("%29s", player->nickname);
-    fflush(stdin);
+    fflush(stdin); */
     // empezar a instanciar los pokemons del jugador
-    printf("Ahora elija los pokemons de %s\n", player->nickname);
+    /* printf("Ahora elija los pokemons de %s\n", player->nickname); */
     for (int i = 0; i < MAX_POKEMONS_PER_PLAYER; ++i)
     {
         player->playerPokemons[i] = (pokemon_t *)malloc(sizeof(pokemon_t));
-        getPokemonNumbersFromUser(player, i);
+        //getPokemonNumbersFromUser(player, i);
     }
 }
