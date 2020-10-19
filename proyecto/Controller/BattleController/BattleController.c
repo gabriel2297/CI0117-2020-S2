@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
-#include "pthread_barrier.h"
+#include <time.h>
 #include "BattleController.h"
 
 typedef struct
@@ -23,27 +23,32 @@ typedef struct
 
 void *fight(void *args)
 {
-    // obtener los datos que nos enviaron al crear el hilo
     thread_data_t *local_data = (thread_data_t *)args;
     shared_data_t *shared_data = local_data->shared_data;
+    size_t thread_num = local_data->thread_num;
+    int energyCharged = 0;
     player_t *player = local_data->player;
     player_t *opponent = local_data->opponent;
-    size_t thread_num = local_data->thread_num;
     pokemon_t *pokemon = player->playerPokemons[thread_num];
+    pokemon_t *opponentPokemon;
+    move_info_t *chargedMove = (move_info_t *)malloc(sizeof(move_info_t));
+    move_info_t *fastMove = (move_info_t *)malloc(sizeof(move_info_t));
+    chargedMove->id = pokemon->pokemon_info->chargedMoveId;
+    fastMove->id = pokemon->pokemon_info->fastMoveId;
+    loadPokemonMoves(chargedMove, fastMove);
+
 
     pthread_barrier_wait(&shared_data->barrier);
-
     pthread_mutex_lock(&shared_data->mutex);
     if (thread_num != player->pokemonTurn)
     {
         pthread_cond_wait(&player->condition[thread_num], &shared_data->mutex);
     }
 
-    pokemon->start_time = clock();
+    pokemon->start_time = time(NULL);
 
     while (1)
     {
-        sleep(3);
         if (player->playerId == shared_data->playerTurn)
         {
             if (pokemon->hp <= 0 || shared_data->isLast)
@@ -51,11 +56,30 @@ void *fight(void *args)
                 pthread_mutex_unlock(&shared_data->mutex);
                 break;
             }
-            printf("%s:\n\t> %s ataca a %s!\n", player->nickname, pokemon->pokemon_info->speciesName, opponent->playerPokemons[opponent->pokemonTurn]->pokemon_info->speciesName);
-            opponent->playerPokemons[opponent->pokemonTurn]->hp = opponent->playerPokemons[opponent->pokemonTurn]->hp - 500;
-            shared_data->playerTurn = opponent->playerId;
-            printf("\t> Ataque efectivo! Redujo la vida de %s a %zu\n", opponent->playerPokemons[opponent->pokemonTurn]->pokemon_info->speciesName, opponent->playerPokemons[opponent->pokemonTurn]->hp);
-            pthread_cond_signal(&opponent->condition[opponent->pokemonTurn]);
+
+            opponentPokemon = opponent->playerPokemons[opponent->pokemonTurn];
+        
+            if(energyCharged >= chargedMove->energy)
+            {
+                printf("%s:\n\t> %s atacando a %s con movimiento cargado!\n", player->nickname, pokemon->pokemon_info->speciesName, opponentPokemon->pokemon_info->speciesName);
+                doChargedMove(chargedMove, opponentPokemon);
+                energyCharged = 0;
+                shared_data->playerTurn = opponent->playerId;
+                pthread_cond_signal(&opponent->condition[opponent->pokemonTurn]);
+                //usleep(100*1000);
+                usleep((chargedMove->cooldown * 1000));
+            }
+            else
+            {
+                printf("%s:\n\t> %s atacando a %s con movimiento rapido!\n", player->nickname, pokemon->pokemon_info->speciesName, opponentPokemon->pokemon_info->speciesName);
+                doFastMove(fastMove, opponentPokemon);
+                energyCharged += fastMove->energyGain;
+                shared_data->playerTurn = opponent->playerId;
+                pthread_cond_signal(&opponent->condition[opponent->pokemonTurn]);
+                //usleep(100*1000);
+                usleep((fastMove->cooldown * 1000));
+            }        
+            printf("\t> Energia acumulada de %s = %i. Ataque cargado = %i!\n", pokemon->pokemon_info->speciesName, energyCharged, chargedMove->energy);
             pthread_cond_wait(&player->condition[thread_num], &shared_data->mutex);
         }
         else 
@@ -76,7 +100,9 @@ void *fight(void *args)
         shared_data->isLast = 1;
         pthread_cond_signal(&opponent->condition[opponent->pokemonTurn]);
     }
-    pokemon->end_time = clock();
+    pokemon->end_time = time(NULL);
+    free(chargedMove);
+    free(fastMove);
     return NULL;
 }
 
@@ -101,7 +127,7 @@ void initBattle(player_t *player1, player_t *player2)
     thread_data_t *player2_data = (thread_data_t *)malloc(MAX_POKEMONS_PER_PLAYER * sizeof(thread_data_t));
 
     // inicializar los hilos
-    clock_t start_time = clock();
+    unsigned long start_time = time(NULL);
     for (size_t i = 0; i < MAX_POKEMONS_PER_PLAYER; ++i)
     {
         player1_data[i].thread_num = i;
@@ -119,8 +145,6 @@ void initBattle(player_t *player1, player_t *player2)
         pthread_create(&player2_threads[i], NULL, fight, (void *)&player2_data[i]);
     }
 
-    //TODO: hay un bug en pthread_join que cambia la direccion de memoria de playerX->playerPokemons[i]->pokemon_info lo que causa
-    // que el codigo de las estadisticas tire segmentation fault
     for (size_t i = 0; i < MAX_POKEMONS_PER_PLAYER; ++i)
     {
         pthread_join(player1_threads[i], NULL);
@@ -128,14 +152,14 @@ void initBattle(player_t *player1, player_t *player2)
     }
 
     // parar el tiempo y calcular el tiempo que tardo la batalla, aprovechar para destruir las variables de condicion
-    clock_t end_time = clock();
-    double execution_time = (double)(end_time - start_time) / CLOCKS_PER_SEC;
-    printf("Duracion de la batalla: %f segundos\n", execution_time);
+    unsigned long end_time = time(NULL) - start_time;
+    printf("Duracion de la batalla: %lu segundos\n", end_time);
     for (size_t i = 0; i < MAX_POKEMONS_PER_PLAYER; ++i)
     {
-        printf("\t- Pokemon %s del jugador %s duro %ld en la batalla\n", player1->playerPokemons[i]->pokemon_info->speciesName, player1->nickname, ((player1->playerPokemons[i]->end_time - player1->playerPokemons[i]->end_time) / CLOCKS_PER_SEC));
+
+        printf("\t- Pokemon %s del jugador %s duro %lu segundos en la batalla\n", player1->playerPokemons[i]->pokemon_info->speciesName, player1->nickname, (player1->playerPokemons[i]->end_time - player1->playerPokemons[i]->start_time) );
         pthread_cond_destroy(&player1->condition[i]);
-        printf("\t- Pokemon %s del jugador %s duro %ld en la batalla\n", player2->playerPokemons[i]->pokemon_info->speciesName, player2->nickname, ((player2->playerPokemons[i]->end_time - player2->playerPokemons[i]->end_time) / CLOCKS_PER_SEC));
+        printf("\t- Pokemon %s del jugador %s duro %lu segundos en la batalla\n", player2->playerPokemons[i]->pokemon_info->speciesName, player2->nickname, (player2->playerPokemons[i]->end_time - player2->playerPokemons[i]->start_time) );
         pthread_cond_destroy(&player2->condition[i]);
     }
 
