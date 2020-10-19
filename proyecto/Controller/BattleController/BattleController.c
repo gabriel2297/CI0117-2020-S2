@@ -55,15 +55,18 @@ void *fight(void *args)
         {
             if (pokemon->hp <= 0 || shared_data->isLast)
             {
+                setPokemonHP(player->playerId, 0);
                 pthread_mutex_unlock(&shared_data->mutex);
                 break;
             }
 
+            setPokemonHP(player->playerId, pokemon->hp);
             opponentPokemon = opponent->playerPokemons[opponent->pokemonTurn];
-        
+
             if(energyCharged >= chargedMove->energy)
             {
                 printf("%s:\n\t> %s atacando a %s con movimiento cargado!\n", player->nickname, pokemon->pokemon_info->speciesName, opponentPokemon->pokemon_info->speciesName);
+                setChargedAttackName(player->playerId ,chargedMove->moveName, chargedMove->power);
                 doChargedMove(chargedMove, opponentPokemon);
                 energyCharged = 0;
                 shared_data->playerTurn = opponent->playerId;
@@ -74,18 +77,21 @@ void *fight(void *args)
             else
             {
                 printf("%s:\n\t> %s atacando a %s con movimiento rapido!\n", player->nickname, pokemon->pokemon_info->speciesName, opponentPokemon->pokemon_info->speciesName);
+                setFastAttackName(player->playerId ,chargedMove->moveName, chargedMove->power);
                 doFastMove(fastMove, opponentPokemon);
                 energyCharged += fastMove->energyGain;
                 shared_data->playerTurn = opponent->playerId;
                 pthread_cond_signal(&opponent->condition[opponent->pokemonTurn]);
                 //usleep(100*1000);
                 usleep((fastMove->cooldown * 1000));
-            }        
+            }
+            setPokemonEnergy(player->playerId, energyCharged);
             printf("\t> Energia acumulada de %s = %i. Ataque cargado = %i!\n", pokemon->pokemon_info->speciesName, energyCharged, chargedMove->energy);
             pthread_cond_wait(&player->condition[thread_num], &shared_data->mutex);
         }
         else 
         {
+            setPokemonHP(player->playerId, pokemon->hp);
             pthread_cond_wait(&player->condition[thread_num], &shared_data->mutex);
         }
     }
