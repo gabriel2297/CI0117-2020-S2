@@ -16,6 +16,7 @@ char pokemon1_energy[200];
 char pokemon2_energy[200];
 char pokemon1_moveNameAndDamage[200];
 char pokemon2_moveNameAndDamage[200];
+char estadisticas[500];
 GtkWidget * image;
 GtkWidget * sprite1;
 GtkWidget * sprite2;
@@ -48,7 +49,7 @@ static void start_async(GTask *task, gpointer source_object, gpointer task_data,
 void setPokemonName(int playerId, char * name){
     if (playerId == 1){
         strcpy(pokemonName1, name);
-        gtk_image_clear(GTK_IMAGE(sprite1));
+        //gtk_image_clear(GTK_IMAGE(sprite1));
         memset(path, 0, sizeof path);
         strcpy(path,"sprites/");
         strcat(path, getPokemonName());
@@ -58,7 +59,7 @@ void setPokemonName(int playerId, char * name){
     }
     else {
         strcpy(pokemonName2, name);
-        gtk_image_clear(GTK_IMAGE(sprite2));
+        //gtk_image_clear(GTK_IMAGE(sprite2));
         memset(path2, 0, sizeof path2);
         strcpy(path2,"sprites/");
         strcat(path2, getPokemon2Name());
@@ -89,6 +90,32 @@ void setPokemonHP(int playerId, int hp)
     {
         int n = sprintf(pokemon2_hp, "%s, yo te elijo!\nVida: %d", getPokemon2Name(), hp);
         gtk_label_set_text(GTK_LABEL(lbl_three), pokemon2_hp);
+    }
+}
+
+void setWinnerInformation(int playerId, char * name) {
+    if (playerId == 1)
+    {
+        printf("Jugador 1 es el ganador\n");
+        int n = sprintf(pokemon1_hp, "Felicidades %s, el jugador %d es el ganador!\n", name, playerId);
+        sprintf(pokemon2_hp, "-");
+        gtk_label_set_text(GTK_LABEL(lbl_three), pokemon2_hp);
+        gtk_label_set_text(GTK_LABEL(lbl_two), pokemon1_hp);
+        n = sprintf(pokemon1_energy, "-");
+        gtk_label_set_text(GTK_LABEL(lbl_four), pokemon1_energy);
+        n = sprintf(pokemon2_energy, "-");
+        gtk_label_set_text(GTK_LABEL(lbl_five), pokemon2_energy);
+    }
+    else {
+        printf("Jugador 2 es el ganador\n");
+        int n = sprintf(pokemon2_hp, "Felicidades %s, el jugador %d es el ganador!\n", name, playerId);
+        gtk_label_set_text(GTK_LABEL(lbl_three), pokemon2_hp);
+        sprintf(pokemon1_hp, "-");
+        gtk_label_set_text(GTK_LABEL(lbl_two), pokemon1_hp);
+        n = sprintf(pokemon2_energy, "-");
+        gtk_label_set_text(GTK_LABEL(lbl_five), pokemon2_energy);
+        n = sprintf(pokemon1_energy, "-");
+        gtk_label_set_text(GTK_LABEL(lbl_four), pokemon1_energy);
     }
 }
 
@@ -135,6 +162,31 @@ void setChargedAttackName(int playerId, char * moveName, int damage)
         int n = sprintf(pokemon1_moveNameAndDamage, "%s, usa ataque cargado!\nAtaque: %s\nDaño: %d\n", getPokemon2Name(), moveName, damage);
         gtk_label_set_text(GTK_LABEL(lbl_one), pokemon2_moveNameAndDamage);
     }
+}
+
+void setPokemonStatistics(unsigned long pokemon_statistics[3][3], pokemon_t* player1_pokemons[MAX_POKEMONS_PER_PLAYER], pokemon_t* player2_pokemons[MAX_POKEMONS_PER_PLAYER])
+{
+    printf("mostrando estadisticas\n");
+    int n = sprintf(estadisticas, "Estadisticas del juego:\n \
+        Duracion total: %lu segundos\n \
+        Pokemons jugador 1:\n \
+        \t- Duracion de %s: %lu segundos\n \
+        \t- Duracion de %s: %lu segundos\n \
+        \t- Duracion de %s: %lu segundos\n \
+        Pokemons jugador 2:\n \
+        \t- Duracion de %s: %lu segundos\n \
+        \t- Duracion de %s: %lu segundos\n \
+        \t- Duracion de %s: %lu segundos\n",
+        pokemon_statistics[2][0],
+        player1_pokemons[0]->pokemon_info->speciesName, pokemon_statistics[0][0],
+        player1_pokemons[1]->pokemon_info->speciesName, pokemon_statistics[0][1],
+        player1_pokemons[2]->pokemon_info->speciesName, pokemon_statistics[0][2],
+        player2_pokemons[0]->pokemon_info->speciesName, pokemon_statistics[1][0],
+        player2_pokemons[1]->pokemon_info->speciesName, pokemon_statistics[1][1],
+        player2_pokemons[2]->pokemon_info->speciesName, pokemon_statistics[1][2]
+    );
+    printf("%s\n", estadisticas);
+    gtk_label_set_text(GTK_LABEL(lbl_one), estadisticas);
 }
 
 void on_box1_changed(GtkComboBox * comboBox, gpointer data){
@@ -197,8 +249,6 @@ void on_ready_button_clicked(GtkWidget * ready_button, gpointer data){
     gtk_image_set_from_pixbuf(GTK_IMAGE(sprite1), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite1)), 100, 100, GDK_INTERP_NEAREST));
     gtk_image_set_from_file(GTK_IMAGE(sprite2), path2);
     gtk_image_set_from_pixbuf(GTK_IMAGE(sprite2), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite2)), 100, 100, GDK_INTERP_NEAREST));
-
-    //gtk_label_set_text(GTK_LABEL(lbl_two), );
 
     g_object_unref(G_OBJECT(builder));
     gtk_widget_show(third_window);

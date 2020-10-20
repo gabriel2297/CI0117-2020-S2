@@ -45,7 +45,7 @@ void loadPokemonMoves(move_info_t* chargedMove, move_info_t* fastMove)
     fastMove->typeId = get_move_type_id(chargedMove->id);
 }
 
-size_t calculateMoveEffectiveness(size_t target_pokemon_type, size_t attacking_move_type) 
+double calculateMoveEffectiveness(size_t target_pokemon_type, size_t attacking_move_type) 
 {
     if (weaknesses_matrix[target_pokemon_type][attacking_move_type]) 
     {
@@ -67,16 +67,16 @@ size_t calculateMoveEffectiveness(size_t target_pokemon_type, size_t attacking_m
 
 void doChargedMove(move_info_t* chargedMove, pokemon_t* opponentPokemon) 
 {
-    size_t effectiveness = calculateMoveEffectiveness(opponentPokemon->pokemon_info->typeId, chargedMove->typeId);
-    size_t damage = floor(chargedMove->power * effectiveness * BONUS) + 1;
+    double effectiveness = calculateMoveEffectiveness(opponentPokemon->pokemon_info->typeId, chargedMove->typeId);
+    double damage = floor(chargedMove->power * effectiveness * BONUS) + 1;
     opponentPokemon->hp -= damage;
-    printf("\t> %s hp = %i after being damaged by %zu\n", opponentPokemon->pokemon_info->speciesName, opponentPokemon->hp, damage);
+    printf("\t> %s hp = %i after being damaged by %f\n", opponentPokemon->pokemon_info->speciesName, opponentPokemon->hp, damage);
 }
 
 void doFastMove(move_info_t* fastMove, pokemon_t* opponentPokemon)
 {
-    size_t effectiveness = calculateMoveEffectiveness(opponentPokemon->pokemon_info->typeId, fastMove->typeId);
-    size_t damage = floor(fastMove->power * effectiveness * BONUS) + 1;
+    double effectiveness = calculateMoveEffectiveness(opponentPokemon->pokemon_info->typeId, fastMove->typeId);
+    double damage = floor(fastMove->power * effectiveness * BONUS) + 1;
     opponentPokemon->hp -= damage;
-    printf("\t> %s hp = %i after being damaged by %zu\n", opponentPokemon->pokemon_info->speciesName, opponentPokemon->hp, damage);
+    printf("\t> %s hp = %i after being damaged by %f\n", opponentPokemon->pokemon_info->speciesName, opponentPokemon->hp, damage);
 }
