@@ -70,7 +70,6 @@ void doChargedMove(move_info_t* chargedMove, pokemon_t* opponentPokemon)
     double effectiveness = calculateMoveEffectiveness(opponentPokemon->pokemon_info->typeId, chargedMove->typeId);
     double damage = floor(chargedMove->power * effectiveness * BONUS) + 1;
     opponentPokemon->hp -= damage;
-    printf("\t> %s hp = %i after being damaged by %f\n", opponentPokemon->pokemon_info->speciesName, opponentPokemon->hp, damage);
 }
 
 void doFastMove(move_info_t* fastMove, pokemon_t* opponentPokemon)
@@ -78,5 +77,4 @@ void doFastMove(move_info_t* fastMove, pokemon_t* opponentPokemon)
     double effectiveness = calculateMoveEffectiveness(opponentPokemon->pokemon_info->typeId, fastMove->typeId);
     double damage = floor(fastMove->power * effectiveness * BONUS) + 1;
     opponentPokemon->hp -= damage;
-    printf("\t> %s hp = %i after being damaged by %f\n", opponentPokemon->pokemon_info->speciesName, opponentPokemon->hp, damage);
 }

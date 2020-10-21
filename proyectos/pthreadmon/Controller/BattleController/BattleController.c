@@ -60,7 +60,6 @@ void *fight(void *args)
             }
             else if (shared_data->isLast)
             {
-                printf("Ultimo pokemon, saliendo\n");
                 setWinnerInformation(player->playerId, pokemon->pokemon_info->speciesName);
                 pthread_mutex_unlock(&shared_data->mutex);
                 break;
@@ -71,7 +70,6 @@ void *fight(void *args)
 
             if(energyCharged >= chargedMove->energy)
             {
-                printf("%s:\n\t> ****************%s atacando a %s con movimiento cargado!*****************\n", player->nickname, pokemon->pokemon_info->speciesName, opponentPokemon->pokemon_info->speciesName);
                 setChargedAttackName(player->playerId, chargedMove->moveName, chargedMove->power);
                 doChargedMove(chargedMove, opponentPokemon);
                 energyCharged = 0;
@@ -82,7 +80,6 @@ void *fight(void *args)
             }
             else
             {
-                printf("%s:\n\t> %s atacando a %s con movimiento rapido!\n", player->nickname, pokemon->pokemon_info->speciesName, opponentPokemon->pokemon_info->speciesName);
                 setFastAttackName(player->playerId ,chargedMove->moveName, chargedMove->power);
                 doFastMove(fastMove, opponentPokemon);
                 energyCharged += fastMove->energyGain;
@@ -92,7 +89,6 @@ void *fight(void *args)
                 usleep((fastMove->cooldown * 1000));
             }
             setPokemonEnergy(player->playerId, energyCharged);
-            printf("\t> Energia acumulada de %s = %i. Ataque cargado = %i!\n", pokemon->pokemon_info->speciesName, energyCharged, chargedMove->energy);
             pthread_cond_wait(&player->condition[thread_num], &shared_data->mutex);
         }
         else 
@@ -105,7 +101,6 @@ void *fight(void *args)
     ++player->pokemonTurn;
     if (player->pokemonTurn < (size_t)MAX_POKEMONS_PER_PLAYER)
     {
-        printf("%s:\n\t> %s yo te elijo!\n", player->nickname, player->playerPokemons[player->pokemonTurn]->pokemon_info->speciesName);
         pthread_cond_signal(&player->condition[player->pokemonTurn]);
     }
     else if (player->pokemonTurn == (size_t)MAX_POKEMONS_PER_PLAYER && opponent->pokemonTurn < (size_t)MAX_POKEMONS_PER_PLAYER)
@@ -169,13 +164,10 @@ void initBattle(player_t *player1, player_t *player2)
     unsigned long end_time = time(NULL) - start_time;
     unsigned long pokemon_statistics[3][3];
     pokemon_statistics[2][0] = end_time;
-    printf("Duracion de la batalla: %lu segundos\n", pokemon_statistics[2][0]);
     for (size_t i = 0; i < MAX_POKEMONS_PER_PLAYER; ++i)
     {        
         pokemon_statistics[0][i] = player1->playerPokemons[i]->end_time - player1->playerPokemons[i]->start_time;
-        printf("\t- Pokemon %s del jugador %s duro %lu segundos en la batalla\n", player1->playerPokemons[i]->pokemon_info->speciesName, player1->nickname, pokemon_statistics[0][i]);
         pokemon_statistics[1][i] = player2->playerPokemons[i]->end_time - player2->playerPokemons[i]->start_time;
-        printf("\t- Pokemon %s del jugador %s duro %lu segundos en la batalla\n", player2->playerPokemons[i]->pokemon_info->speciesName, player2->nickname, pokemon_statistics[1][i] );
         pthread_cond_destroy(&player1->condition[i]);
         pthread_cond_destroy(&player2->condition[i]);
     }
