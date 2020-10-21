@@ -30,7 +30,7 @@ El código fuente del programa se encuentra en GitHub.  Requerimientos para pode
 5. Una vez instaladas las utilidades, proceder a moverse a la carpeta donde se encuentra descargado el proyecto y correr el comando “make”. Hecho esto, se puede correr el programa. Una ventana aparecera. 
 ```
 ❯ make
-gcc `pkg-config --cflags gtk+-3.0` -o pthreadmon interface.c `pkg-config --libs gtk+-3.0`
+gcc `pkg-config --cflags gtk+-3.0` -O0 -g -o pthreadmon main.c Model/mapper.c Controller/GameController/GameController.c Controller/PlayerController/PlayerController.c Controller/BattleController/BattleController.c Controller/PokemonController/PokemonController.c -pthread -lm `pkg-config --libs gtk+-3.0`
 ❯ ./pthreadmon
 ```
 ### Como utilizar el programa 
