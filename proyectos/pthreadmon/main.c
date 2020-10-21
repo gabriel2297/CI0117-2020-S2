@@ -80,7 +80,6 @@ char * getPokemon2Name(){
 
 void setPokemonHP(int playerId, int hp)
 {
-    printf("Setting hp %d for player %d\n", hp, playerId);
     if (playerId == 1)
     { 
         int n = sprintf(pokemon1_hp, "%s, yo te elijo!\nVida: %d", getPokemonName(), hp);
@@ -234,14 +233,14 @@ void on_ready_button_clicked(GtkWidget * ready_button, gpointer data){
     /* Igualmente con el Pokemon name, HP y energy que debe de ir disminuyendo en cada ocación
     En attacks info debe de actualizarse el contenido cada vez que se realice una batalla */
 
-    strcat(path, getPokemonName());
-    strcat(path, ".png");
-    strcat(path2, getPokemon2Name());
-    strcat(path2, ".png");
-    gtk_image_set_from_file(GTK_IMAGE(sprite1), path);
-    gtk_image_set_from_pixbuf(GTK_IMAGE(sprite1), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite1)), 100, 100, GDK_INTERP_NEAREST));
-    gtk_image_set_from_file(GTK_IMAGE(sprite2), path2);
-    gtk_image_set_from_pixbuf(GTK_IMAGE(sprite2), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite2)), 100, 100, GDK_INTERP_NEAREST));
+    // strcat(path, getPokemonName());
+    // strcat(path, ".png");
+    // strcat(path2, getPokemon2Name());
+    // strcat(path2, ".png");
+    // gtk_image_set_from_file(GTK_IMAGE(sprite1), path);
+    // gtk_image_set_from_pixbuf(GTK_IMAGE(sprite1), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite1)), 100, 100, GDK_INTERP_NEAREST));
+    // gtk_image_set_from_file(GTK_IMAGE(sprite2), path2);
+    // gtk_image_set_from_pixbuf(GTK_IMAGE(sprite2), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite2)), 100, 100, GDK_INTERP_NEAREST));
 
     g_object_unref(G_OBJECT(builder));
     gtk_widget_show(third_window);

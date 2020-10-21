@@ -36,9 +36,6 @@ void startGame(int id_matrix[2][3])
     for (int i = 0; i < MAX_POKEMONS_PER_PLAYER; ++i){
         set_pokemon_player(player2, i, id_matrix[1][i]);
     }
-    // mostrar la informacion de los jugadores
-    showPlayerInformation(player1);
-    showPlayerInformation(player2);
 
     // iniciar batalla
     initBattle(player1, player2);
