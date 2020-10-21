@@ -89,7 +89,7 @@ void *fight(void *args)
                 //usleep(100*1000);
                 usleep((fastMove->cooldown * 1000));
             }
-            setPokemonEnergy(player->playerId, energyCharged);
+            setPokemonEnergy(player->playerId, energyCharged, chargedMove->energy);
             pthread_cond_wait(&player->condition[thread_num], &shared_data->mutex);
         }
         else 

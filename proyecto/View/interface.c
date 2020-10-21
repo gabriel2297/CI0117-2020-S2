@@ -1,15 +1,15 @@
 #include <gtk/gtk.h>
 #include <stdio.h>
-#include "Controller/GameController/GameController.h"
-#include "Controller/PlayerController/PlayerController.h"
-#include "Model/mapper.h"
+#include "../Controller/GameController/GameController.h"
+#include "../Controller/PlayerController/PlayerController.h"
+#include "../Model/mapper.h"
 #include <stdlib.h>
 #include <string.h>
 int id_matrix[2][3];
 char pokemonName1[200]; 
 char pokemonName2[200];
-char path[200] = "View/sprites/";
-char path2[200] = "View/sprites/";
+char path[200] = "sprites/";
+char path2[200] = "sprites/";
 char pokemon1_hp[200];
 char pokemon2_hp[200];
 char pokemon1_energy[200];
@@ -25,7 +25,6 @@ GtkBuilder * builder;
 GtkWidget * window;
 GtkWidget * second_window;
 GtkWidget * third_window;
-GtkEntry * text_entry;
 GtkWidget * lbl_one;
 GtkWidget * lbl_two;
 GtkWidget * lbl_three;
@@ -51,9 +50,10 @@ void setPokemonName(int playerId, char * name){
         strcpy(pokemonName1, name);
         //gtk_image_clear(GTK_IMAGE(sprite1));
         memset(path, 0, sizeof path);
-        strcpy(path,"View/sprites/");
+        strcpy(path,"sprites/");
         strcat(path, getPokemonName());
         strcat(path, ".png");
+        printf("PATH: %s", path);
         gtk_image_set_from_file(GTK_IMAGE(sprite1), path);
         gtk_image_set_from_pixbuf(GTK_IMAGE(sprite1), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite1)), 100, 100, GDK_INTERP_NEAREST));
     }
@@ -61,9 +61,10 @@ void setPokemonName(int playerId, char * name){
         strcpy(pokemonName2, name);
         //gtk_image_clear(GTK_IMAGE(sprite2));
         memset(path2, 0, sizeof path2);
-        strcpy(path2,"View/sprites/");
+        strcpy(path2,"sprites/");
         strcat(path2, getPokemon2Name());
         strcat(path2, ".png");
+        printf("PATH: %s", path2);
         gtk_image_set_from_file(GTK_IMAGE(sprite2), path2);
         gtk_image_set_from_pixbuf(GTK_IMAGE(sprite2), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite2)), 100, 100, GDK_INTERP_NEAREST));
         
@@ -80,14 +81,15 @@ char * getPokemon2Name(){
 
 void setPokemonHP(int playerId, int hp)
 {
+    printf("Setting hp %d for player %d\n", hp, playerId);
     if (playerId == 1)
     { 
-        int n = sprintf(pokemon1_hp, "%s \nVida: %d", getPokemonName(), hp);
+        int n = sprintf(pokemon1_hp, "%s, yo te elijo!\nVida: %d", getPokemonName(), hp);
         gtk_label_set_text(GTK_LABEL(lbl_two), pokemon1_hp);
     }
     else
     {
-        int n = sprintf(pokemon2_hp, "%s \nVida: %d", getPokemon2Name(), hp);
+        int n = sprintf(pokemon2_hp, "%s, yo te elijo!\nVida: %d", getPokemon2Name(), hp);
         gtk_label_set_text(GTK_LABEL(lbl_three), pokemon2_hp);
     }
 }
@@ -95,6 +97,7 @@ void setPokemonHP(int playerId, int hp)
 void setWinnerInformation(int playerId, char * name) {
     if (playerId == 1)
     {
+        printf("Jugador 1 es el ganador\n");
         int n = sprintf(pokemon1_hp, "Felicidades %s, el jugador %d es el ganador!\n", name, playerId);
         sprintf(pokemon2_hp, "-");
         gtk_label_set_text(GTK_LABEL(lbl_three), pokemon2_hp);
@@ -105,6 +108,7 @@ void setWinnerInformation(int playerId, char * name) {
         gtk_label_set_text(GTK_LABEL(lbl_five), pokemon2_energy);
     }
     else {
+        printf("Jugador 2 es el ganador\n");
         int n = sprintf(pokemon2_hp, "Felicidades %s, el jugador %d es el ganador!\n", name, playerId);
         gtk_label_set_text(GTK_LABEL(lbl_three), pokemon2_hp);
         sprintf(pokemon1_hp, "-");
@@ -116,22 +120,24 @@ void setWinnerInformation(int playerId, char * name) {
     }
 }
 
-void setPokemonEnergy(int playerId, int energy, int chargedMove_energy) 
+void setPokemonEnergy(int playerId, int energy) 
 {
+    printf("Setting energy %d for player %d\n", energy, playerId);
     if (playerId == 1)
     { 
-        int n = sprintf(pokemon1_energy, "Energia acumulada: %d / %d", energy, chargedMove_energy);
+        int n = sprintf(pokemon1_energy, "Energia aculumada: %d", energy);
         gtk_label_set_text(GTK_LABEL(lbl_four), pokemon1_energy);
     }
     else
     {
-        int n = sprintf(pokemon2_energy, "Energia acumulada: %d / %d", energy, chargedMove_energy);
+        int n = sprintf(pokemon2_energy, "Energia acumulada: %d", energy);
         gtk_label_set_text(GTK_LABEL(lbl_five), pokemon2_energy);
     }
 }
 
 void setFastAttackName(int playerId, char * moveName, int damage)
 {
+    printf("Setting attack %s with damage %d for player %d\n", moveName, damage, playerId);
     if (playerId == 1)
     { 
         int n = sprintf(pokemon1_moveNameAndDamage, "%s, usa ataque rapido!\nAtaque: %s\nDaño: %d\n", getPokemonName(), moveName, damage);
@@ -146,6 +152,7 @@ void setFastAttackName(int playerId, char * moveName, int damage)
 
 void setChargedAttackName(int playerId, char * moveName, int damage)
 {
+    printf("Setting attack %s with damage %d for player %d\n", moveName, damage, playerId);
     if (playerId == 1)
     { 
         int n = sprintf(pokemon1_moveNameAndDamage, "%s, usa ataque cargado!\nAtaque: %s\nDaño: %d\n", getPokemonName(), moveName, damage);
@@ -160,6 +167,7 @@ void setChargedAttackName(int playerId, char * moveName, int damage)
 
 void setPokemonStatistics(unsigned long pokemon_statistics[3][3], pokemon_t* player1_pokemons[MAX_POKEMONS_PER_PLAYER], pokemon_t* player2_pokemons[MAX_POKEMONS_PER_PLAYER])
 {
+    printf("mostrando estadisticas\n");
     int n = sprintf(estadisticas, "Estadisticas del juego:\n \
         Duracion total: %lu segundos\n \
         Pokemons jugador 1:\n \
@@ -178,6 +186,7 @@ void setPokemonStatistics(unsigned long pokemon_statistics[3][3], pokemon_t* pla
         player2_pokemons[1]->pokemon_info->speciesName, pokemon_statistics[1][1],
         player2_pokemons[2]->pokemon_info->speciesName, pokemon_statistics[1][2]
     );
+    printf("%s\n", estadisticas);
     gtk_label_set_text(GTK_LABEL(lbl_one), estadisticas);
 }
 
@@ -203,15 +212,6 @@ void on_box6_changed(GtkComboBox * comboBox, gpointer data){
 }
 
 void on_ready_button_clicked(GtkWidget * ready_button, gpointer data){
-    /* Validación de datos */
-        for (int i = 0; i < 3; ++i){
-        for (int j = i + 1; j < 3; ++j){
-            if ((id_matrix[0][i] == id_matrix[0][j]) || id_matrix[1][i] == id_matrix[1][j]){
-                printf("ERROR: No se puede seleccionar dos pokemon de la misma especie\n");
-                return;
-            }
-        }
-    }
     
     GCancellable *cancellable = g_cancellable_new();
     GTask *task = g_task_new(g_object_new(G_TYPE_OBJECT, NULL), cancellable, my_callback, NULL);
@@ -223,7 +223,7 @@ void on_ready_button_clicked(GtkWidget * ready_button, gpointer data){
     g_log_set_handler ("Gtk", G_LOG_LEVEL_WARNING, g_log_default_handler, NULL);
 
     builder = gtk_builder_new();
-    gtk_builder_add_from_file (builder, "View/Interface.glade", NULL);
+    gtk_builder_add_from_file (builder, "Interface.glade", NULL);
     third_window = GTK_WIDGET (gtk_builder_get_object (builder, "Battle_window")); 
     if (NULL == third_window)
     {
@@ -236,18 +236,6 @@ void on_ready_button_clicked(GtkWidget * ready_button, gpointer data){
     lbl_five = GTK_WIDGET(gtk_builder_get_object(builder, "energy2"));
     sprite1 = GTK_WIDGET(gtk_builder_get_object(builder, "sprite1"));
     sprite2 = GTK_WIDGET(gtk_builder_get_object(builder, "sprite2"));
-    /* A las imagenes debe de asignarle el correspondiente sprite */
-    /* Igualmente con el Pokemon name, HP y energy que debe de ir disminuyendo en cada ocación
-    En attacks info debe de actualizarse el contenido cada vez que se realice una batalla */
-
-    // strcat(path, getPokemonName());
-    // strcat(path, ".png");
-    // strcat(path2, getPokemon2Name());
-    // strcat(path2, ".png");
-    // gtk_image_set_from_file(GTK_IMAGE(sprite1), path);
-    // gtk_image_set_from_pixbuf(GTK_IMAGE(sprite1), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite1)), 100, 100, GDK_INTERP_NEAREST));
-    // gtk_image_set_from_file(GTK_IMAGE(sprite2), path2);
-    // gtk_image_set_from_pixbuf(GTK_IMAGE(sprite2), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite2)), 100, 100, GDK_INTERP_NEAREST));
 
     g_object_unref(G_OBJECT(builder));
     gtk_widget_show(third_window);
@@ -258,7 +246,6 @@ void on_start_button_clicked(GtkWidget * start_button, gpointer data){
 
     GCancellable *cancellable = g_cancellable_new();
     GTask *task = g_task_new(g_object_new(G_TYPE_OBJECT, NULL), cancellable, my_callback, NULL);
-    //g_task_run_in_thread(task, start_async);
     g_object_unref(task);
     gtk_widget_hide(window);
 
@@ -267,7 +254,7 @@ void on_start_button_clicked(GtkWidget * start_button, gpointer data){
 
     builder = gtk_builder_new();
 
-    gtk_builder_add_from_file (builder, "View/Interface.glade", NULL);
+    gtk_builder_add_from_file (builder, "Interface.glade", NULL);
     second_window = GTK_WIDGET (gtk_builder_get_object (builder, "second_window")); 
     if (NULL == second_window)
     {
@@ -321,7 +308,7 @@ static void activate(GtkApplication *app, gpointer user_data){
 
     builder = gtk_builder_new();
 
-    gtk_builder_add_from_file (builder, "View/Interface.glade", NULL);
+    gtk_builder_add_from_file (builder, "Interface.glade", NULL);
 
     window = GTK_WIDGET (gtk_builder_get_object (builder, "window1")); 
     if (NULL == window)
@@ -333,7 +320,6 @@ static void activate(GtkApplication *app, gpointer user_data){
     image = GTK_WIDGET(gtk_builder_get_object(builder, "logo"));
     button_box = GTK_WIDGET(gtk_builder_get_object(builder, "button_box"));
     button = GTK_WIDGET(gtk_builder_get_object(builder, "start_button"));
-    text_entry = GTK_ENTRY(gtk_builder_get_object(builder, "name_entry"));
     g_signal_connect (button, "clicked", G_CALLBACK (on_start_button_clicked), NULL);
     g_object_unref(G_OBJECT(builder));
     gtk_widget_show(window);

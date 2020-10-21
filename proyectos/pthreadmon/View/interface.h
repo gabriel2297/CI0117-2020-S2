@@ -7,7 +7,7 @@ void setPokemonName(int, char *);
 char * getPokemonName();
 char * getPokemon2Name();
 void setPokemonHP(int, int);
-void setPokemonEnergy(int, int);
+void setPokemonEnergy(int, int, int);
 void setFastAttackName(int playerId, char * moveName, int damage);
 void setChargedAttackName(int playerId, char * moveName, int damage);
 void setWinnerInformation(int, char *);
