@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <pthread.h>
 #include "GameController.h"
 #include <string.h>
@@ -15,6 +16,7 @@ void destroyPlayer(player_t *player)
 
 void startGame(int id_matrix[2][3])
 {
+
     // instanciar el jugador 1, ponerle nombre y mostrar su informacion
     player_t *player1 = (player_t *)malloc(sizeof(player_t));
     player1->condition = (pthread_cond_t *)malloc(sizeof(pthread_cond_t) * MAX_POKEMONS_PER_PLAYER);

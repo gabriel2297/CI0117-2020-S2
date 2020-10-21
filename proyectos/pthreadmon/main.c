@@ -205,6 +205,14 @@ void on_box6_changed(GtkComboBox * comboBox, gpointer data){
 void on_ready_button_clicked(GtkWidget * ready_button, gpointer data){
     /* Ventana donde se lleva a cabo la batalla
     Deben de mostrarse las estructuras de datos correspondientes */
+        for (int i = 0; i < 3; ++i){
+        for (int j = i + 1; j < 3; ++j){
+            if ((id_matrix[0][i] == id_matrix[0][j]) || id_matrix[1][i] == id_matrix[1][j]){
+                printf("ERROR: No se puede seleccionar dos pokemon de la misma especie\n");
+                return;
+            }
+        }
+    }
     
     GCancellable *cancellable = g_cancellable_new();
     GTask *task = g_task_new(g_object_new(G_TYPE_OBJECT, NULL), cancellable, my_callback, NULL);

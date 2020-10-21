@@ -23,6 +23,7 @@ typedef struct
 
 void *fight(void *args)
 {
+
     thread_data_t *local_data = (thread_data_t *)args;
     shared_data_t *shared_data = local_data->shared_data;
     size_t thread_num = local_data->thread_num;
@@ -47,7 +48,7 @@ void *fight(void *args)
     pokemon->start_time = time(NULL);
 
     setPokemonName(player->playerId,pokemon->pokemon_info->speciesName);
-    
+
     while (1)
     {
         if (player->playerId == shared_data->playerTurn)
