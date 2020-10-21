@@ -37,13 +37,23 @@ gcc `pkg-config --cflags gtk+-3.0` -O0 -g -o pthreadmon main.c Model/mapper.c Co
 
 Una vez que se corrieron los comandos anteriores se mostrará una ventana similar a la que se muestra en la imagen de abajo. Para iniciar el juego es necesario dar click en “Start!”. 
 
-A continuación el usuario será presentado con una pantalla en donde deberá elegir los pokemones de cada jugador, hemos hecho esta seleccion simple al usar dropdowns. Una vez seleccionados todos los pokemones el usuario puede dar click a "Start Battle!", lo que procedera a cargar los pokemones de los jugadores y la batalla iniciara, el usuario podra ver de manera interactiva como los pokemons van atacandose, cual ataca, la vida restante, la energia acumulada y la energia necesaria para realizar un ataque cargado. 
+![Demostracion de menu principal](View/Images/ventana_principal.png?raw=true "Demostracion de menu principal")
+
+A continuación el usuario será presentado con una pantalla en donde deberá elegir los pokemones de cada jugador, hemos hecho esta seleccion simple al usar dropdowns. 
+
+![Demostracion de ventana secundaria](View/Images/ventana_secundaria.png?raw=true "Demostracion de ventana secundaria")
+
+Una vez seleccionados todos los pokemones el usuario puede dar click a "Start Battle!", lo que procedera a cargar los pokemones de los jugadores y la batalla iniciara, el usuario podra ver de manera interactiva como los pokemons van atacandose, cual ataca, la vida restante, la energia acumulada y la energia necesaria para realizar un ataque cargado. 
+
+![Demostracion de ventana de batalla](View/Images/battle.png?raw=true "Demostracion de ventana de batalla")
 
 Al finalizar la partida se muestran las estadisticas del juego. Entre ellas se muestra: 
 1. La duracion total de la partida, en segundos.
 2. La duracion de cada pokemon, de cada jugador, en segundos. 
 
 En esta misma ventana se muestra un boton para reiniciar la batalla, al darle click los usuarios seran llevados a la interfaz anterior para seleccionar los pokemones y la aplicacion empezara desde 0. 
+
+![Demostracion de ventana de batalla](View/Images/estadisticas.png?raw=true "Demostracion de ventana de batalla")
 
 ### Estructura del programa
 
