@@ -37,7 +37,7 @@ void *fight(void *args)
     chargedMove->id = pokemon->pokemon_info->chargedMoveId;
     fastMove->id = pokemon->pokemon_info->fastMoveId;
     loadPokemonMoves(chargedMove, fastMove);
-
+    
     pthread_barrier_wait(&shared_data->barrier);
     pthread_mutex_lock(&shared_data->mutex);
     if (thread_num != player->pokemonTurn)
@@ -46,9 +46,7 @@ void *fight(void *args)
     }
 
     pokemon->start_time = time(NULL);
-
     setPokemonName(player->playerId,pokemon->pokemon_info->speciesName);
-
     while (1)
     {
         if (player->playerId == shared_data->playerTurn)
@@ -146,7 +144,7 @@ void initBattle(player_t *player1, player_t *player2)
         player1_data[i].opponent = player2;
         pthread_cond_init(&player1_data->player->condition[i], NULL);
         pthread_create(&player1_threads[i], NULL, fight, (void *)&player1_data[i]);
-
+    
         player2_data[i].thread_num = i;
         player2_data[i].shared_data = shared_data;
         player2_data[i].player = player2;

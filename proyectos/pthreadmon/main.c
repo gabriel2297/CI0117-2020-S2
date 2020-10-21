@@ -55,7 +55,7 @@ void setPokemonName(int playerId, char * name){
         strcat(path, getPokemonName());
         strcat(path, ".png");
         gtk_image_set_from_file(GTK_IMAGE(sprite1), path);
-        gtk_image_set_from_pixbuf(GTK_IMAGE(sprite1), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite1)), 100, 100, GDK_INTERP_NEAREST));
+        gtk_image_set_from_pixbuf(GTK_IMAGE(sprite1), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite1)), 80, 80, GDK_INTERP_NEAREST));
     }
     else {
         strcpy(pokemonName2, name);
@@ -65,7 +65,7 @@ void setPokemonName(int playerId, char * name){
         strcat(path2, getPokemon2Name());
         strcat(path2, ".png");
         gtk_image_set_from_file(GTK_IMAGE(sprite2), path2);
-        gtk_image_set_from_pixbuf(GTK_IMAGE(sprite2), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite2)), 100, 100, GDK_INTERP_NEAREST));
+        gtk_image_set_from_pixbuf(GTK_IMAGE(sprite2), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite2)), 80, 80, GDK_INTERP_NEAREST));
         
     }
 }
@@ -240,15 +240,15 @@ void on_ready_button_clicked(GtkWidget * ready_button, gpointer data){
     /* Igualmente con el Pokemon name, HP y energy que debe de ir disminuyendo en cada ocación
     En attacks info debe de actualizarse el contenido cada vez que se realice una batalla */
 
-    // strcat(path, getPokemonName());
-    // strcat(path, ".png");
-    // strcat(path2, getPokemon2Name());
-    // strcat(path2, ".png");
-    // gtk_image_set_from_file(GTK_IMAGE(sprite1), path);
-    // gtk_image_set_from_pixbuf(GTK_IMAGE(sprite1), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite1)), 100, 100, GDK_INTERP_NEAREST));
-    // gtk_image_set_from_file(GTK_IMAGE(sprite2), path2);
-    // gtk_image_set_from_pixbuf(GTK_IMAGE(sprite2), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite2)), 100, 100, GDK_INTERP_NEAREST));
-
+/*     strcat(path, getPokemonName());
+    strcat(path, ".png");
+    strcat(path2, getPokemon2Name());
+    strcat(path2, ".png");
+    gtk_image_set_from_file(GTK_IMAGE(sprite1), path);
+    gtk_image_set_from_pixbuf(GTK_IMAGE(sprite1), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite1)), 100, 100, GDK_INTERP_NEAREST));
+    gtk_image_set_from_file(GTK_IMAGE(sprite2), path2);
+    gtk_image_set_from_pixbuf(GTK_IMAGE(sprite2), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite2)), 100, 100, GDK_INTERP_NEAREST));
+ */
     g_object_unref(G_OBJECT(builder));
     gtk_widget_show(third_window);
 
