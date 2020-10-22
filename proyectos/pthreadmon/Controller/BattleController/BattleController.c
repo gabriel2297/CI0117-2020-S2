@@ -56,7 +56,11 @@ void *fight(void *args)
                 isImageSet = 1;
                 setPokemonName(player->playerId,pokemon->pokemon_info->speciesName);
             }
-            
+            else 
+            {
+                setPokemonName(player->playerId,pokemon->pokemon_info->speciesName);
+            }
+
             if (pokemon->hp <= 0)
             {
                 setPokemonHP(player->playerId, 0);
