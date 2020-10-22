@@ -18,8 +18,7 @@ char pokemon1_moveNameAndDamage[200];
 char pokemon2_moveNameAndDamage[200];
 char estadisticas[500];
 GtkWidget * image;
-GtkWidget * sprite1;
-GtkWidget * sprite2;
+GtkWidget * button_box2; 
 GtkWidget * button_box; 
 GtkBuilder * builder; 
 GtkWidget * window;
@@ -32,6 +31,7 @@ GtkWidget * lbl_three;
 GtkWidget * lbl_four;
 GtkWidget * lbl_five;
 GtkWidget * button;
+GtkWidget * button2;
 GtkComboBoxText * list_chooser_one;
 GtkComboBoxText * list_chooser_two;
 GtkComboBoxText * list_chooser_three;
@@ -47,27 +47,23 @@ static void start_async(GTask *task, gpointer source_object, gpointer task_data,
     startGame(id_matrix);
 }
 
+/* void on_retry_button_clicked(GtkWidget * button2, gpointer data){
+    GCancellable *cancellable = g_cancellable_new();
+    GTask *task = g_task_new(g_object_new(G_TYPE_OBJECT, NULL), cancellable, my_callback, NULL);
+    g_task_run_in_thread(task, start_async);
+    g_object_unref(task);
+    gtk_widget_hide(third_window);
+    gtk_widget_show(second_window);
+} */
+
 void setPokemonName(int playerId, char * name){
     pthread_mutex_lock(&mutex);
     if (playerId == 1){
         strcpy(pokemonName1, name);
-        //gtk_image_clear(GTK_IMAGE(sprite1));
-        memset(path, 0, sizeof path);
-        strcpy(path,"View/sprites/");
-        strcat(path, getPokemonName());
-        strcat(path, ".png");
-        gtk_image_set_from_file(GTK_IMAGE(sprite1), path);
-        gtk_image_set_from_pixbuf(GTK_IMAGE(sprite1), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite1)), 80, 80, GDK_INTERP_NEAREST));
     }
     else {
         strcpy(pokemonName2, name);
-        //gtk_image_clear(GTK_IMAGE(sprite2));
-        memset(path2, 0, sizeof path2);
-        strcpy(path2,"View/sprites/");
-        strcat(path2, getPokemon2Name());
-        strcat(path2, ".png");
-        gtk_image_set_from_file(GTK_IMAGE(sprite2), path2);
-        gtk_image_set_from_pixbuf(GTK_IMAGE(sprite2), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite2)), 80, 80, GDK_INTERP_NEAREST));
+
     }
     pthread_mutex_unlock(&mutex);
 }
@@ -214,6 +210,7 @@ void setPokemonStatistics(unsigned long pokemon_statistics[3][3], pokemon_t* pla
         player2_pokemons[2]->pokemon_info->speciesName, pokemon_statistics[1][2]
     );
     gtk_label_set_text(GTK_LABEL(lbl_one), estadisticas);
+    gtk_widget_show(button2);
 }
 
 void on_box1_changed(GtkComboBox * comboBox, gpointer data){
@@ -264,26 +261,18 @@ void on_ready_button_clicked(GtkWidget * ready_button, gpointer data){
     {
         fprintf(stderr, "Unable to file object with id \"Battle_window\" \n");
     }
+    gtk_window_set_default_size(GTK_WINDOW(third_window), 440, 400);
+    gtk_window_set_resizable (GTK_WINDOW(third_window), FALSE);
     lbl_one = GTK_WIDGET(gtk_builder_get_object(builder, "attack_info"));
     lbl_two = GTK_WIDGET(gtk_builder_get_object(builder, "pokemon1"));
     lbl_three = GTK_WIDGET(gtk_builder_get_object(builder, "pokemon2"));
     lbl_four = GTK_WIDGET(gtk_builder_get_object(builder, "energy1"));
     lbl_five = GTK_WIDGET(gtk_builder_get_object(builder, "energy2"));
-    sprite1 = GTK_WIDGET(gtk_builder_get_object(builder, "sprite1"));
-    sprite2 = GTK_WIDGET(gtk_builder_get_object(builder, "sprite2"));
-    /* A las imagenes debe de asignarle el correspondiente sprite */
-    /* Igualmente con el Pokemon name, HP y energy que debe de ir disminuyendo en cada ocación
-    En attacks info debe de actualizarse el contenido cada vez que se realice una batalla */
+    button_box2 = GTK_WIDGET(gtk_builder_get_object(builder, "retry_box"));
+    button2 = GTK_WIDGET(gtk_builder_get_object(builder, "retry_button"));
 
-/*     strcat(path, getPokemonName());
-    strcat(path, ".png");
-    strcat(path2, getPokemon2Name());
-    strcat(path2, ".png");
-    gtk_image_set_from_file(GTK_IMAGE(sprite1), path);
-    gtk_image_set_from_pixbuf(GTK_IMAGE(sprite1), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite1)), 100, 100, GDK_INTERP_NEAREST));
-    gtk_image_set_from_file(GTK_IMAGE(sprite2), path2);
-    gtk_image_set_from_pixbuf(GTK_IMAGE(sprite2), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite2)), 100, 100, GDK_INTERP_NEAREST));
- */
+    gtk_widget_hide(button2);
+    //g_signal_connect (button2, "clicked", G_CALLBACK (on_retry_button_clicked), NULL);
     g_object_unref(G_OBJECT(builder));
     gtk_widget_show(third_window);
 

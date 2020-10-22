@@ -4,7 +4,7 @@
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkWindow" id="Battle_window">
     <property name="can_focus">False</property>
-    <property name="default_width">500</property>
+    <property name="default_width">400</property>
     <property name="default_height">400</property>
     <child type="titlebar">
       <placeholder/>
@@ -50,29 +50,6 @@
           </packing>
         </child>
         <child>
-          <object class="GtkImage" id="sprite1">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="margin_left">1</property>
-            <property name="stock">gtk-missing-image</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">2</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkImage" id="sprite2">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="stock">gtk-missing-image</property>
-          </object>
-          <packing>
-            <property name="left_attach">4</property>
-            <property name="top_attach">2</property>
-          </packing>
-        </child>
-        <child>
           <object class="GtkLabel" id="energy1">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
@@ -93,6 +70,35 @@
             <property name="left_attach">4</property>
             <property name="top_attach">3</property>
           </packing>
+        </child>
+        <child>
+          <object class="GtkButtonBox" id="retry_box">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="orientation">vertical</property>
+            <property name="layout_style">start</property>
+            <child>
+              <object class="GtkButton" id="retry_button">
+                <property name="label" translatable="yes">Play Again!</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <signal name="clicked" handler="on_retry_button_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="left_attach">2</property>
+            <property name="top_attach">3</property>
+          </packing>
+        </child>
+        <child>
+          <placeholder/>
         </child>
         <child>
           <placeholder/>
