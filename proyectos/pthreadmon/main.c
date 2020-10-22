@@ -49,26 +49,23 @@ static void start_async(GTask *task, gpointer source_object, gpointer task_data,
 
 void setPokemonName(int playerId, char * name){
     pthread_mutex_lock(&mutex);
-    printf("Setting image for player %d\n", playerId);
     if (playerId == 1){
         strcpy(pokemonName1, name);
-        gtk_image_clear(GTK_IMAGE(sprite1));
+        //gtk_image_clear(GTK_IMAGE(sprite1));
         memset(path, 0, sizeof path);
         strcpy(path,"View/sprites/");
         strcat(path, getPokemonName());
         strcat(path, ".png");
-        printf("Path to file: %s\n", path);
         gtk_image_set_from_file(GTK_IMAGE(sprite1), path);
         gtk_image_set_from_pixbuf(GTK_IMAGE(sprite1), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite1)), 80, 80, GDK_INTERP_NEAREST));
     }
     else {
         strcpy(pokemonName2, name);
-        gtk_image_clear(GTK_IMAGE(sprite2));
+        //gtk_image_clear(GTK_IMAGE(sprite2));
         memset(path2, 0, sizeof path2);
         strcpy(path2,"View/sprites/");
         strcat(path2, getPokemon2Name());
         strcat(path2, ".png");
-        printf("Path to file: %s\n", path2);
         gtk_image_set_from_file(GTK_IMAGE(sprite2), path2);
         gtk_image_set_from_pixbuf(GTK_IMAGE(sprite2), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite2)), 80, 80, GDK_INTERP_NEAREST));
     }

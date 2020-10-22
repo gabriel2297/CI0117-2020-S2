@@ -36,6 +36,7 @@ void *fight(void *args)
     move_info_t *fastMove = (move_info_t *)malloc(sizeof(move_info_t));
     chargedMove->id = pokemon->pokemon_info->chargedMoveId;
     fastMove->id = pokemon->pokemon_info->fastMoveId;
+    int isImageSet = 0;
     loadPokemonMoves(chargedMove, fastMove);
     
     pthread_barrier_wait(&shared_data->barrier);
@@ -46,11 +47,16 @@ void *fight(void *args)
     }
 
     pokemon->start_time = time(NULL);
-    setPokemonName(player->playerId,pokemon->pokemon_info->speciesName);
     while (1)
     {
         if (player->playerId == shared_data->playerTurn)
         {
+            if(!isImageSet) 
+            {
+                isImageSet = 1;
+                setPokemonName(player->playerId,pokemon->pokemon_info->speciesName);
+            }
+            
             if (pokemon->hp <= 0)
             {
                 setPokemonHP(player->playerId, 0);
