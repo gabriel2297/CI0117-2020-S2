@@ -38,6 +38,7 @@ GtkComboBoxText * list_chooser_three;
 GtkComboBoxText * list_chooser_four;
 GtkComboBoxText * list_chooser_five;
 GtkComboBoxText * list_chooser_six;
+pthread_mutex_t mutex;
 
 static void my_callback(GObject *source_object, GAsyncResult *res, gpointer user_data){}
 
@@ -47,27 +48,31 @@ static void start_async(GTask *task, gpointer source_object, gpointer task_data,
 }
 
 void setPokemonName(int playerId, char * name){
+    pthread_mutex_lock(&mutex);
+    printf("Setting image for player %d\n", playerId);
     if (playerId == 1){
         strcpy(pokemonName1, name);
-        //gtk_image_clear(GTK_IMAGE(sprite1));
+        gtk_image_clear(GTK_IMAGE(sprite1));
         memset(path, 0, sizeof path);
         strcpy(path,"View/sprites/");
         strcat(path, getPokemonName());
         strcat(path, ".png");
+        printf("Path to file: %s\n", path);
         gtk_image_set_from_file(GTK_IMAGE(sprite1), path);
         gtk_image_set_from_pixbuf(GTK_IMAGE(sprite1), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite1)), 80, 80, GDK_INTERP_NEAREST));
     }
     else {
         strcpy(pokemonName2, name);
-        //gtk_image_clear(GTK_IMAGE(sprite2));
+        gtk_image_clear(GTK_IMAGE(sprite2));
         memset(path2, 0, sizeof path2);
         strcpy(path2,"View/sprites/");
         strcat(path2, getPokemon2Name());
         strcat(path2, ".png");
+        printf("Path to file: %s\n", path2);
         gtk_image_set_from_file(GTK_IMAGE(sprite2), path2);
         gtk_image_set_from_pixbuf(GTK_IMAGE(sprite2), gdk_pixbuf_scale_simple(gtk_image_get_pixbuf(GTK_IMAGE(sprite2)), 80, 80, GDK_INTERP_NEAREST));
-        
     }
+    pthread_mutex_unlock(&mutex);
 }
 
 char * getPokemonName(){
@@ -116,17 +121,50 @@ void setWinnerInformation(int playerId, char * name) {
     }
 }
 
-void setPokemonEnergy(int playerId, int energy, int chargedMove_energy) 
+void setPokemonEnergy(int playerId, int energy, int chargedMove_energy, int pokemonNumber) 
 {
+    int n;
     if (playerId == 1)
-    { 
-        int n = sprintf(pokemon1_energy, "Energia acumulada: %d / %d", energy, chargedMove_energy);
-        gtk_label_set_text(GTK_LABEL(lbl_four), pokemon1_energy);
+    {
+        switch(pokemonNumber) {
+            case 0:
+                n = sprintf(pokemon1_energy, "Energia acumulada: %d / %d\nPokemons: [o, o, o]", energy, chargedMove_energy);
+                gtk_label_set_text(GTK_LABEL(lbl_four), pokemon1_energy);
+                break;
+            case 1:
+                n = sprintf(pokemon1_energy, "Energia acumulada: %d / %d\nPokemons: [x, o, o]", energy, chargedMove_energy);
+                gtk_label_set_text(GTK_LABEL(lbl_four), pokemon1_energy);
+                break;
+            case 2: 
+                n = sprintf(pokemon1_energy, "Energia acumulada: %d / %d\nPokemons: [x, x, o]", energy, chargedMove_energy);
+                gtk_label_set_text(GTK_LABEL(lbl_four), pokemon1_energy);
+                break;
+            default: 
+                n = sprintf(pokemon1_energy, "Energia acumulada: %d / %d\nPokemons: [x, x, x]", energy, chargedMove_energy);
+                gtk_label_set_text(GTK_LABEL(lbl_four), pokemon1_energy);
+                break;
+        }
     }
     else
     {
-        int n = sprintf(pokemon2_energy, "Energia acumulada: %d / %d", energy, chargedMove_energy);
-        gtk_label_set_text(GTK_LABEL(lbl_five), pokemon2_energy);
+        switch(pokemonNumber) {
+            case 0:
+                n = sprintf(pokemon2_energy, "Energia acumulada: %d / %d\nPokemons: [o, o, o]", energy, chargedMove_energy);
+                gtk_label_set_text(GTK_LABEL(lbl_five), pokemon2_energy);
+                break;
+            case 1:
+                n = sprintf(pokemon2_energy, "Energia acumulada: %d / %d\nPokemons: [x, o, o]", energy, chargedMove_energy);
+                gtk_label_set_text(GTK_LABEL(lbl_five), pokemon2_energy);
+                break;
+            case 2: 
+                n = sprintf(pokemon2_energy, "Energia acumulada: %d / %d\nPokemons: [x, x, o]", energy, chargedMove_energy);
+                gtk_label_set_text(GTK_LABEL(lbl_five), pokemon2_energy);
+                break;
+            default: 
+                n = sprintf(pokemon2_energy, "Energia acumulada: %d / %d\nPokemons: [x, x, x]", energy, chargedMove_energy);
+                gtk_label_set_text(GTK_LABEL(lbl_five), pokemon2_energy);
+                break;
+        }
     }
 }
 
@@ -204,7 +242,7 @@ void on_box6_changed(GtkComboBox * comboBox, gpointer data){
 
 void on_ready_button_clicked(GtkWidget * ready_button, gpointer data){
     /* Validación de datos */
-        for (int i = 0; i < 3; ++i){
+    for (int i = 0; i < 3; ++i){
         for (int j = i + 1; j < 3; ++j){
             if ((id_matrix[0][i] == id_matrix[0][j]) || id_matrix[1][i] == id_matrix[1][j]){
                 printf("ERROR: No se puede seleccionar dos pokemon de la misma especie\n");
@@ -309,6 +347,7 @@ void on_start_button_clicked(GtkWidget * start_button, gpointer data){
 
 
 void on_window_destroyed(){
+    pthread_mutex_destroy(&mutex);
     gtk_main_quit();
 }
 
@@ -343,7 +382,7 @@ static void activate(GtkApplication *app, gpointer user_data){
 int main(int argc, char * argv[]){
     GtkApplication *app;
     int status;
-
+    pthread_mutex_init(&mutex, NULL);
     app = gtk_application_new("pthreadmon.simulator", G_APPLICATION_FLAGS_NONE);
     g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
     status = g_application_run(G_APPLICATION(app), argc, argv);
