@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 int id_matrix[2][3];
-char pokemonName1[200]; 
+char pokemonName1[200];
 char pokemonName2[200];
 char path[200] = "View/sprites/";
 char path2[200] = "View/sprites/";
@@ -47,14 +47,14 @@ static void start_async(GTask *task, gpointer source_object, gpointer task_data,
     startGame(id_matrix);
 }
 
-/* void on_retry_button_clicked(GtkWidget * button2, gpointer data){
+void on_retry_button_clicked(GtkWidget * button2, gpointer data){
     GCancellable *cancellable = g_cancellable_new();
     GTask *task = g_task_new(g_object_new(G_TYPE_OBJECT, NULL), cancellable, my_callback, NULL);
     g_task_run_in_thread(task, start_async);
     g_object_unref(task);
     gtk_widget_hide(third_window);
     gtk_widget_show(second_window);
-} */
+}
 
 void setPokemonName(int playerId, char * name){
     pthread_mutex_lock(&mutex);
@@ -63,7 +63,6 @@ void setPokemonName(int playerId, char * name){
     }
     else {
         strcpy(pokemonName2, name);
-
     }
     pthread_mutex_unlock(&mutex);
 }
@@ -272,7 +271,7 @@ void on_ready_button_clicked(GtkWidget * ready_button, gpointer data){
     button2 = GTK_WIDGET(gtk_builder_get_object(builder, "retry_button"));
 
     gtk_widget_hide(button2);
-    //g_signal_connect (button2, "clicked", G_CALLBACK (on_retry_button_clicked), NULL);
+    g_signal_connect (button2, "clicked", G_CALLBACK (on_retry_button_clicked), NULL);
     g_object_unref(G_OBJECT(builder));
     gtk_widget_show(third_window);
 
