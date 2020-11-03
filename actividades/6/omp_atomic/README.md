@@ -19,3 +19,15 @@ Diferencias:
 
 ### Referencias
 
+[critical vs atomic - Stack Overflow](https://stackoverflow.com/questions/7798010/what-is-the-difference-between-atomic-and-critical-in-openmp#:~:text=The%20most%20important%20difference%20between,use%20it%20with%20specific%20operators.&text=Critical%20section%3A,use%20of%20%22name%22%20tag.)
+
+[critical vs atomic - OpenMP Forum](https://forum.openmp.org/viewtopic.php?t=1549)
+
+[omp - Microsoft C++ Docs](https://docs.microsoft.com/en-us/cpp/parallel/openmp/reference/openmp-directives?view=msvc-160#atomic)
+
+[omp critical - IBM Knowledge center](https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.cbclx01/prag_omp_critical.htm)
+
+[omp atomic - IBM Knowledge center](https://www.ibm.com/support/knowledgecenter/SSGH2K_13.1.2/com.ibm.xlc1312.aix.doc/compiler_ref/prag_omp_atomic.html)
+
+[omp atomic - OpenMP API Specification](https://www.openmp.org/spec-html/5.0/openmpsu95.html)
+
