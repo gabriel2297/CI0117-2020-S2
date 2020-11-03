@@ -27,6 +27,6 @@ int main(){
     for (int i = 0; i < 10; ++i){
         cout << copied_array[i] << " ";
     }
-    cout << endl;
+    
     return 0;
 }
