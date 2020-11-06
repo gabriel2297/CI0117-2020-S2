@@ -1,2 +1,2 @@
-compile:	count_primes.cpp
-	g++ -g count_primes.cpp -o count_primes
+compile:	count_primes_serial.cpp
+	g++ -g count_primes_serial.cpp -o count_primes_serial

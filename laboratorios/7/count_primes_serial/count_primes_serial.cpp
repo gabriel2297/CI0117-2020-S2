@@ -1,25 +1,24 @@
 #include <iostream>
 #include <omp.h>
 #include <time.h>
+#include <math.h>
 #include <string>
 using namespace std;
 
 
-/* @brief Contar cuantos numeros primeros hay entre dos y el número
-    @param limite superior para el conteo de numeros primos
-    @return total de numeros primos entre dos y el numero dado */
-int count_primes(int upper_limit){
-    int counter = 0;
-    for (int i = 2; i < upper_limit; ++i){
-        for (int j = 2; j <= i; ++j){
-            if (!(i % j) && (i !=j)){
-                break;
-            } else if (i == j){
-                counter++;
-            }
-        }
-    }
-    return counter;
+/*  @brief Contar cuantos numeros primeros hay entre dos y el número
+    @param el numero que queremos saber si es primo
+    @return si el numero es primo o no 
+*/
+bool isPrime(int number){
+    if ( number < 2 ) return false;
+	if ( number == 2 ) return true;
+	if ( number % 2 == 0 ) return false;
+
+	for ( size_t i = 3, last = (size_t)(double)sqrt(number); i <= last; i += 2 )
+		if ( number % i == 0 ) return false;
+
+	return true;
 }
 
 int main(int argc, char *argv[])
@@ -39,7 +38,9 @@ int main(int argc, char *argv[])
         upper_limit = stoi(argv[1]);
     }
     start = clock(); 
-    counter = count_primes(upper_limit);
+    
+    for(int i = 2; i < upper_limit; ++i) 
+        if (isPrime(i)) ++counter;
     end = clock();
     double time_taken = double(end - start) / double(CLOCKS_PER_SEC);
     cout << "There are " << counter << " prime numbers between 2 and " << upper_limit << endl;
