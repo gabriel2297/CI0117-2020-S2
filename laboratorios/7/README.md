@@ -45,12 +45,14 @@ En este caso para escoger los valores de N se obtuvo la cantidad por defecto de 
 
 Para valores constantes como static, 1 y dynamic, 1 se obtuvieron los siguientes resultados:
 |Planificación |   Tiempo    |
+|--------------|-------------|
 | static, 1    | 139.890527s |
 | dynamic, 1   | 97.774604s  |
 
 Para los valores de N
 
 |Planificación                         | static, N  | dynamic, N   |
+|--------------------------------------|------------|--------------|
 | N = cantidad de hilos                | 98.891831s | 97.307262s   |
 | N = mitad del total de hilos         | 99.007316s | 99.290917s   |
 | N = mitad del total de iteraciones   | 180.103404s| 185.410482s  |
