@@ -96,7 +96,7 @@ Para valores contantes:
 |--------------|-------------|
 | static, 1    | 139.890527s |
 | dynamic, 1   | 97.774604s  |
-| guided, 1    |             |
+| guided, 1    | 87.629999s  |
 
 Para los diferentes valores de N:
 
