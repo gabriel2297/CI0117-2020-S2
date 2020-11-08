@@ -52,6 +52,7 @@ int main(int argc, char *argv[])
     {
         upper_limit = stoi(argv[1]);
     }
+
     walltime_start(walltime);
     #pragma omp parallel for default(none) shared(upper_limit) reduction(+: counter) schedule(runtime)
     for (int i = 2; i < upper_limit; ++i){
