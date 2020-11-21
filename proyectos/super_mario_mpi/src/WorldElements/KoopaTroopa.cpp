@@ -9,6 +9,8 @@
 using namespace std;
 
 class KoopaTroopa: public WorldElement {
+    private:
+        Action actions[TOTAL_ACTIONS] { no_jump, jump_and_kill, jump_and_move };
     public:
         const Action* getActions()
         {
@@ -16,7 +18,8 @@ class KoopaTroopa: public WorldElement {
         }
         double getActionProbability(Action action)
         {
-            switch(action){
+            switch(action)
+            {
                 case no_jump:
                     return NO_JUMP;
                 case jump_and_kill:
@@ -27,6 +30,4 @@ class KoopaTroopa: public WorldElement {
                     return -1;
             }
         }
-    private:
-        Action actions[TOTAL_ACTIONS] { no_jump, jump_and_kill, jump_and_move };
 };

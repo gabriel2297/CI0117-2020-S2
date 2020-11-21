@@ -1,26 +1,27 @@
-#ifndef _WORLD
-#define _WORLD
+#ifndef WORLD_H
+#define WORLD_H
+#include <iostream>
 #include <queue>
-typedef int Enemy;
+#include <vector>
+#include "enums.h"
 
-class World {
+#define WORLD_SLOTS 130
+
+class World 
+{
   private:
-    queue<* World> cola;
-    queue * array;
-    int coin;
-    int hole;
-    Enemy litle_goomba;
-    Enemy koopa_troopa;
-    int flag;
+    std::vector<std::queue<Element>> world;
+    typedef std::queue<Element> cola;
+    void initWorld();
   public:
     World();
     ~World();
-    void setCoin(int); //Coloca una moneda en una posicion x
-    void setHole(int); //Coloca un agujero en una posicion x
-    void setLittle_Goomba(int); //Asigna un little_goomba a una posicion x
-    void setKoopa_troopa(int); //Asigna un koopa_troopa a una posicion x
-    bool thereIsaCoin(int); //Si hay una moneda en x posicion
-    bool thereIsaHole(int); //Si hay un agujero en x posicion
-    bool thereIsaEnemy(int); //Si hay un enemigo en x posicion
+    void pushCoin(int);
+    void pushHole(int);
+    void pushLittleGoomba(int);
+    void pushKoopaTroopa(int); 
+    Element getTotalElementsInPosition(int);
+    Element getNextElementInPosition(int);
 };
+
 #endif
