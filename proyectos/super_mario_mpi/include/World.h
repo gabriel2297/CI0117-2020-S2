@@ -7,21 +7,19 @@
 
 #define WORLD_SLOTS 130
 
-class World 
+class World
 {
-  private:
-    std::vector<std::queue<Element>> world;
-    typedef std::queue<Element> cola;
-    void initWorld();
-  public:
-    World();
-    ~World();
-    void pushCoin(int);
-    void pushHole(int);
-    void pushLittleGoomba(int);
-    void pushKoopaTroopa(int); 
-    Element getTotalElementsInPosition(int);
-    Element getNextElementInPosition(int);
+private:
+  std::vector<std::queue<Element>> world;
+  typedef std::queue<Element> cola;
+  void initWorld();
+
+public:
+  World();
+  ~World();
+  void pushElement(Element, int);
+  int World::getTotalElementsInPosition(int index);
+  Element getNextElementInPosition(int);
 };
 
 #endif
