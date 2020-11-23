@@ -6,3 +6,12 @@ Player::Player(){
     this->active = true;
 }
 
+Player::~Player(){}
+
+void Player::setActive(bool active){
+    this->active = active;
+}
+
+bool Player::isActive(){
+    return this->active;
+}

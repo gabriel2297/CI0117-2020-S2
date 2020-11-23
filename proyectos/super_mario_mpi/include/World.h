@@ -5,7 +5,7 @@
 #include <vector>
 #include "enums.h"
 
-#define WORLD_SLOTS 130
+#define WORLD_SLOTS 103
 
 class World
 {

@@ -7,7 +7,8 @@ enum Element
     Coin,
     Hole,
     LittleGoomba,
-    KoopaTroopa
+    KoopaTroopa,
+    Flag
 };
 enum Action
 {
