@@ -11,6 +11,14 @@ A continuación se presentan los resultados obtenidos en cuanto a tiempo de ejec
 count_primes_process
 
 
+| Procesos     |   Tiempo    |
+|--------------|-------------|
+|      1       |  10.6466s   |
+|     16       |  3.63848s   |
+|     32       |  3.94943s   | 
+|     64       |  4.20005s   |
+
+
 |  Procesos |  Tiempo    |
 |------------------------|
 |      1    |  10.6466s  |
