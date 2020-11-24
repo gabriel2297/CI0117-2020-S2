@@ -8,7 +8,8 @@
 Para la realización de las pruebas se definió como cota superior el número 10000000.	
 A continuación se presentan los resultados obtenidos en cuanto a tiempo de ejecución para los tres problemas:
 
-* count_primes_process   
+count_primes_process
+
 
 |  Procesos |  Tiempo    |
 |------------------------|
@@ -17,7 +18,9 @@ A continuación se presentan los resultados obtenidos en cuanto a tiempo de ejec
 |     32    |  3.94943s  | 
 |     64    |  4.20005s  |
 
-* count_primes_reduction 
+
+count_primes_reduction 
+
 
 |  Procesos |  Tiempo    |
 |------------------------|
@@ -27,7 +30,8 @@ A continuación se presentan los resultados obtenidos en cuanto a tiempo de ejec
 |     64    |  5.03874s  |
 
 
-*  count_primes_all_reduction 
+count_primes_all_reduction 
+
 
 |  Procesos |  Tiempo        |
 |----------------------------|
