@@ -14,45 +14,70 @@ bool isPrime(int number) {
 		if ( number % i == 0 )
 			return false;
 
-	return true;            
-}
-
-// Logica: https://math.stackexchange.com/questions/46014/programming-logic-splitting-up-tasks-between-threads
-void doWork(int* num_processes, int* pid, int* limit)
-{   
-    MPI_Send(&primeCounter, 1, MPI_INT, 0, 123, MPI_COMM_WORLD);
+	return true;
 }
 
 int main(int argc, char *argv[])
 {
-    int upper_limit, num_processes, pid, receive_buffer = 0, counter = 0, time;
-    if (argc < 1) goto error;
-    else if (stoi(argv[argc - 1]) < 2) goto error;
-    else upper_limit = stoi(argv[argc - 1]);
+  int my_id, p_interval, numProcesses, lower_limit, upper_limit, message_sent, message_received, primes = 0, counter = 0, segments, temp;
+  size_t max_num;
+  double start_time = 0.0, end_time = 0.0;
+  MPI_Init(&argc, &argv);
 
-    MPI_Init(&argc, &argv);
-    MPI_Comm_size(MPI_COMM_WORLD, &num_processes);
-    MPI_Comm_rank(MPI_COMM_WORLD, &pid);
-    MPI_Status status;
+  MPI_Comm_size(MPI_COMM_WORLD, &numProcesses);
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_id);
+  MPI_Status status;
 
-    if(pid == 0)
-    {
-        for(int i = 1; i < num_processes; ++i)
-        {   
-            MPI_Recv(&receive_buffer, 1, MPI_INT, i, 123, MPI_COMM_WORLD, &status);
-            cout << "Received " << receive_buffer << " from process " << i << " adding it to counter" << endl;
-            counter+=receive_buffer; 
-        }
-        cout << counter << " primes found in range [2, " << upper_limit << "] in 0.000584510112s with " << num_processes << " processes" << endl;
+  if (my_id == 0){
+    if (argc > 1){
+      max_num = (size_t)strtoul(argv[1], NULL, 10);
+      segments = max_num / numProcesses;
     }
-    else
-        doWork(&num_processes, &pid, &upper_limit);
+    else {
+      std::cerr << "Error, invalid number of parameters" << std::endl;
+      return 1;
+    }
+    for (int i = 1; i < numProcesses; ++i){
+      MPI_Send(&max_num, 1, MPI_INT, i, 123, MPI_COMM_WORLD);
+      MPI_Send(&segments, 1, MPI_INT, i, 123, MPI_COMM_WORLD);
+    }
 
-    MPI_Finalize();
+  }
 
-    return 0;
+  if (!my_id){
+    lower_limit = 0;
+    upper_limit = (int)(my_id + 1) * segments;
+    start_time = MPI_Wtime();
+  }
+  else {
+    MPI_Recv(&max_num, 1, MPI_INT, 0, 123, MPI_COMM_WORLD, &status);
+    MPI_Recv(&segments, 1, MPI_INT, 0, 123, MPI_COMM_WORLD, &status);
+    lower_limit = (int)(my_id * segments) + 1;
+    upper_limit = (my_id == numProcesses - 1) ? max_num : (int)(my_id + 1) * segments;
+  }
 
-error:
-    perror("Error, invalid number of arguments");
-    return -1;
+  for (int i = lower_limit; i <= upper_limit; ++i){
+    if(isPrime(i)){
+      ++counter;
+    }
+  }
+
+  temp = counter;
+  if (my_id != 0){
+    MPI_Send(&temp, 1, MPI_INT, 0, 123, MPI_COMM_WORLD);
+  }
+  else {
+      primes += temp;
+      for (int i = my_id + 1; i < numProcesses; ++i){
+        MPI_Recv(&temp, 1, MPI_INT, i, 123, MPI_COMM_WORLD, &status);
+        primes += temp;
+    }
+    end_time = MPI_Wtime();
+    std::cout << "There are " << primes <<  " prime numbers between [2 , " << max_num << " ] " << std::endl;
+    std::cout << "The total time was " << end_time - start_time << "s" << std::endl;
+  }
+
+  MPI_Finalize();
+
+  return 0;
 }
