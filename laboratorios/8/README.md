@@ -31,9 +31,9 @@ A continuación se presentan los resultados obtenidos en cuanto a tiempo de ejec
 * count_primes_all_reduction 
 
 
-|  Procesos |  Tiempo        |
-|-----------|----------------|
-|      1    |  	      |
-|     16    |  	      |
-|     32    |                | 
-|     64    |                |
+|  Procesos |  Tiempo    |
+|-----------|------------|
+|      1    | 6.225158s  |
+|     16    | 1.057737s  |
+|     32    | 0.819137s  | 
+|     64    | 0.671868s  |
