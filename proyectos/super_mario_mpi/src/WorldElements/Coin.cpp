@@ -1,6 +1,6 @@
 #include <iostream>
-#include "../include/WorldElement.h"
-#include "../include/enums.h"
+#include "../../include/WorldElement.h"
+#include "../../include/enums.h"
 #define NO_JUMP 0.5
 #define JUMP_AND_HIT 0.5
 #define TOTAL_ACTIONS 2

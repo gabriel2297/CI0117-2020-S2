@@ -1,8 +1,11 @@
 #include <iostream>
+#include "include/World.h"
+#include "include/Mapper.h"
 using namespace std;
 
-int main (int argc, char * argv[]){
-  Simulator simulador;
-  simulador.run();
+int main (int argc, char * argv[])
+{
+  World *world = new World();
+  cout << "elements in position 9: " << world->getTotalElementsInPosition(9) << endl;
   return 0;
 }

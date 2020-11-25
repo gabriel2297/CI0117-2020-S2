@@ -9,17 +9,17 @@
 
 class World
 {
-private:
-  std::vector<std::queue<Element>> world;
-  typedef std::queue<Element> cola;
-  void initWorld();
+  private:
+    std::vector<std::queue<Element>> world;
+    typedef std::queue<Element> cola;
+    void initWorld();
 
-public:
-  World();
-  ~World();
-  void pushElement(Element, int);
-  int World::getTotalElementsInPosition(int index);
-  Element getNextElementInPosition(int);
+  public:
+    World();
+    ~World();
+    void pushElement(Element, int);
+    int getTotalElementsInPosition(int index);
+    Element getNextElementInPosition(int);
 };
 
 #endif

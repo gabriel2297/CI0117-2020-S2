@@ -1,6 +1,6 @@
 #include <iostream>
-#include "../include/WorldElement.h"
-#include "../include/enums.h"
+#include "../../include/WorldElement.h"
+#include "../../include/enums.h"
 #define NO_JUMP 0.5
 #define JUMP_AND_MOVE 0.95
 #define TOTAL_ACTIONS 2
@@ -13,7 +13,7 @@ private:
     Action actions[TOTAL_ACTIONS]{no_jump, jump_and_move};
 
 public:
-    const Action *Hole::getActions()
+    const Action *getActions()
     {
         return actions;
     }

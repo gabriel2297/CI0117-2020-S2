@@ -5,12 +5,12 @@
 
 class WorldElement
 {
-private:
-    Action actions[]{};
+    private:
+        Action action;
 
-public:
-    const virtual Action *getActions() = 0;
-    virtual double getActionProbability(Action action) = 0;
+    public:
+        const virtual Action *getActions() = 0;
+        virtual double getActionProbability(Action action) = 0;
 };
 
 #endif

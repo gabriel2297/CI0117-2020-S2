@@ -1,4 +1,5 @@
 #include "../include/World.h"
+#include "../include/Mapper.h"
 
 using namespace std;
 
@@ -18,10 +19,13 @@ World::~World()
 */
 void World::initWorld()
 {
+    Mapper *mapper = new Mapper();
     for (int i = 0; i < WORLD_SLOTS; ++i)
     {
         this->world.push_back(cola());
+        mapper->setElementsAtIndex(this, i);
     }
+    mapper->~Mapper();
     cout << "Successfully created an array of queues of size " << WORLD_SLOTS << endl;
 }
 
@@ -31,6 +35,7 @@ void World::initWorld()
 */
 void World::pushElement(Element element, int index)
 {
+    cout << "Pushing element " << element << " into position " << index << endl;
     this->world[index].push(element);
 }
 
@@ -53,20 +58,20 @@ Element World::getNextElementInPosition(int index)
         return None;
     switch (this->world[index].front())
     {
-    case Coin:
-        this->world[index].pop();
-        return Coin;
-    case Hole:
-        this->world[index].pop();
-        return Hole;
-    case LittleGoomba:
-        this->world[index].pop();
-        return LittleGoomba;
-    case KoopaTroopa:
-        this->world[index].pop();
-        return KoopaTroopa;
-    default:
-        this->world[index].pop();
-        return None;
+        case Coin:
+            this->world[index].pop();
+            return Coin;
+        case Hole:
+            this->world[index].pop();
+            return Hole;
+        case LittleGoomba:
+            this->world[index].pop();
+            return LittleGoomba;
+        case KoopaTroopa:
+            this->world[index].pop();
+            return KoopaTroopa;
+        default:
+            this->world[index].pop();
+            return None;
     }
 }
