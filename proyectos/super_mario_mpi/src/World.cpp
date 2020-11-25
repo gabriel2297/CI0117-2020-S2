@@ -25,7 +25,6 @@ void World::initWorld()
         this->world.push_back(cola());
         mapper->setElementsAtIndex(this, i);
     }
-    mapper->~Mapper();
     cout << "Successfully created an array of queues of size " << WORLD_SLOTS << endl;
 }
 
