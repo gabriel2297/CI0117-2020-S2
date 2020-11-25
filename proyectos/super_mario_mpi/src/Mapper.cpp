@@ -4,7 +4,7 @@ using namespace std;
 
 Mapper::Mapper(){}
 Mapper::~Mapper(){
-    delete this;
+    cout << "Mapper object deleted from heap" << endl;
 }
 
 void Mapper::setElementsAtIndex(World * world, int index){

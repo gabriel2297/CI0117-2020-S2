@@ -8,9 +8,8 @@ World::World()
     initWorld();
 }
 
-World::~World()
-{
-    delete this;
+World::~World(){
+    cout << "World object deleted from heap" << endl;
 }
 
 /**
@@ -25,6 +24,7 @@ void World::initWorld()
         this->world.push_back(cola());
         mapper->setElementsAtIndex(this, i);
     }
+    delete mapper;
     cout << "Successfully created an array of queues of size " << WORLD_SLOTS << endl;
 }
 

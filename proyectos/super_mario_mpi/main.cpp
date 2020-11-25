@@ -7,5 +7,6 @@ int main (int argc, char * argv[])
 {
   World *world = new World();
   cout << "elements in position 9: " << world->getTotalElementsInPosition(9) << endl;
+  delete world;
   return 0;
 }
