@@ -3,9 +3,7 @@
 using namespace std;
 
 Mapper::Mapper(){}
-Mapper::~Mapper(){
-    cout << "Mapper object deleted from heap" << endl;
-}
+Mapper::~Mapper(){}
 
 void Mapper::setElementsAtIndex(World * world, int index){
   switch (index) {

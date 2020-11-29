@@ -8,9 +8,7 @@ World::World()
     initWorld();
 }
 
-World::~World(){
-    cout << "World object deleted from heap" << endl;
-}
+World::~World(){}
 
 /**
  * Initiates a new array, which will represent the world
@@ -25,7 +23,6 @@ void World::initWorld()
         mapper->setElementsAtIndex(this, i);
     }
     delete mapper;
-    cout << "Successfully created an array of queues of size " << WORLD_SLOTS << endl;
 }
 
 /**
@@ -34,7 +31,6 @@ void World::initWorld()
 */
 void World::pushElement(Element element, int index)
 {
-    cout << "Pushing element " << element << " into position " << index << endl;
     this->world[index].push(element);
 }
 
