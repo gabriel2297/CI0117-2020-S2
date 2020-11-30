@@ -3,6 +3,7 @@
 #include "../include/WorldElement.h"
 #include "../include/Player.h"
 #include "../include/enums.h"
+#include <unistd.h>
 #include "mpi.h"
 #include <iostream>
 #include <string>
@@ -41,7 +42,9 @@ void Game::pickStrategy(Strategy* picked_strategy)
 
 /**
  * Validates that the data passed via terminal is valid
- * @param argc pointer to int where the 
+ * @param argc pointer to int, number of arguments from terminal
+ * @param argv char pointer, arguments from terminal
+ * @return only returns true if everything passed. The program stops completely should it fail.
 */
 bool Game::userInputIsValid(int* argc, char* argv[])
 {
@@ -78,6 +81,7 @@ void Game::startGame(int argc, char* argv[])
 
     int position, player_id, playersActiveG, playersActiveL;
     MPI_Status status;
+    MPI_Request request;
     MPI_Init(&argc, &argv);
 
     MPI_Comm_size(MPI_COMM_WORLD, &this->num_processes);
@@ -88,25 +92,49 @@ void Game::startGame(int argc, char* argv[])
     
     // esperar a que el proceso 0 verifique los datos (antes de empezar el juego)
     MPI_Barrier(MPI_COMM_WORLD);
+    
     //Se envia el id del mario escogido 
     MPI_Bcast(&picked_mario, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+    if (my_pid == 0){
+        if (marioIsDead){
+            cout << "Select another mario: ";
+            cin >> picked_mario;
+            MPI_Bcast(&picked_mario, 1, MPI_INT, 0, MPI_COMM_WORLD);
+        }
+    }
 
     if(this->my_pid != 0)
     {
         World * world = new World();
         Player * player = new Player();
+        int elements_in_position = 0;
+        int marioIsDead = 0;
+        Element the_element;
+        Action action;
         while (playersActiveG > 1){
             for (int i = 0; i < WORLD_SLOTS; ++i){
-                if (my_pid == picked)
-                cout << "Process " << this->my_pid << ". Elements at position: " << i << " " << world->getTotalElementsInPosition(i) << endl;
-                usleep(1000);
+                player->mario->setLocation(i);
+                elements_in_position = world->getTotalElementsInPosition(player->mario->getLocation());
+                if(elements_in_position > 0)
+                {
+                    if (my_pid == picked_mario){
+                        cout << "Process " << this->my_pid << ". Elements at position: " << i << " " << world->getTotalElementsInPosition(i) << endl;
+                    }
+                    for(int element = 0; element < elements_in_position; element++)
+                    {
+                        the_element = world->getNextElementInPosition(player->mario->getLocation());
+                        action = player->mario->getActionForElement(the_element);
+                    }
+                }
+                MPI_Send(&marioIsDead, 1, MPI_INT, 0, 123, MPI_COMM_WORLD);
+
+                usleep(100000);
                 if (i == WORLD_SLOTS - 1){
                     i = 0;
                 }
             }
         }
-        //cout << "Proceso " << this->my_pid << " dice: World creado de manera exitosa. "; 
-        //cout << "Elementos en posicion 9: " << world->getTotalElementsInPosition(9) << endl;
         delete world;
         delete player;
     }

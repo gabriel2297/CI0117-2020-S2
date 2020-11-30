@@ -1,4 +1,5 @@
 #include "../include/Mario.h"
+#include "WorldElements/Coin.cpp"
 
 Mario::Mario(){
     this->action = 0;
@@ -35,3 +36,27 @@ int Mario::getCoins(){
     return this->coins;
 }
 
+Action Mario::getActionForElement(Element element)
+{
+    double random_number = generateRandomNumber();
+    Coin coin;
+    switch (element)
+    {
+        case Coin:
+            return coin.getActionBasedOnProbability(random_number);
+        case Hole:
+            break;
+        case LittleGoomba:
+            break;
+        case KoopaTroopa:
+            break;
+        default:
+            break;
+    }
+}
+
+double Mario::generateRandomNumber()
+{
+    srand((unsigned) time(0));
+    return (rand() % 100) + 1;
+}

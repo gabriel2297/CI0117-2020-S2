@@ -10,26 +10,26 @@ using namespace std;
 
 class LittleGoomba : public WorldElement
 {
-private:
-    Action actions[TOTAL_ACTIONS]{no_jump, jump_and_kill, jump_and_move};
+    private:
+        Action actions[TOTAL_ACTIONS]{no_jump, jump_and_kill, jump_and_move};
 
-public:
-    const Action *getActions()
-    {
-        return actions;
-    }
-    double getActionProbability(Action action)
-    {
-        switch (action)
+    public:
+        const Action *getActions()
         {
-        case no_jump:
-            return NO_JUMP;
-        case jump_and_kill:
-            return JUMP_AND_KILL;
-        case jump_and_move:
-            return JUMP_AND_MOVE;
-        default:
-            return -2;
+            return actions;
         }
-    }
+        double getActionProbability(Action action)
+        {
+            switch (action)
+            {
+            case no_jump:
+                return NO_JUMP;
+            case jump_and_kill:
+                return JUMP_AND_KILL;
+            case jump_and_move:
+                return JUMP_AND_MOVE;
+            default:
+                return -2;
+            }
+        }
 };

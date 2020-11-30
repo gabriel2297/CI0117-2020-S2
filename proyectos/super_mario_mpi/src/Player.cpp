@@ -6,7 +6,9 @@ Player::Player(){
     this->active = true;
 }
 
-Player::~Player(){}
+Player::~Player(){
+    delete this->mario;
+}
 
 void Player::setActive(bool active){
     this->active = active;

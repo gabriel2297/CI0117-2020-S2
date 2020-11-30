@@ -10,7 +10,7 @@ class WorldElement
 
     public:
         const virtual Action *getActions() = 0;
-        virtual double getActionProbability(Action action) = 0;
+        virtual Action getActionBasedOnProbability(double probability) = 0;
 };
 
 #endif
