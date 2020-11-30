@@ -12,6 +12,7 @@ class Game
         int my_pid;
         double start_time, end_time;
         Strategy picked_strategy;
+        bool userInputIsValid(int* argc, char* argv[]);
 
     public:
         void pickMario(int* picked_mario, int* num_processes);

@@ -5,13 +5,8 @@ using namespace std;
 
 int main (int argc, char* argv[])
 {
-  if (argc > 2){
-    Game game;
-    game.startGame(argc, argv);
-
-  } else {
-    cout << "Error, invalid number of parameters" << endl;
-    return 1;
-  }
+  // validaciones se realizan dentro del game en si
+  Game game;
+  game.startGame(argc, argv);
   return 0;
 }
