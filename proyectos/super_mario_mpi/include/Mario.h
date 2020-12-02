@@ -1,4 +1,4 @@
-#ifndef _MARIO 
+#ifndef _MARIO
 #define _MARIO
 #include "enums.h"
 #include <cstdlib>
@@ -28,7 +28,7 @@ class Mario {
         int getCoins();
         bool isAlive();
         int chooseAction(int);
-        double generateRandomNumber();
-        Action getActionForElement(Element element);
+        double generateRandomNumber(int);
+        Action getActionForElement(Element element, int);
 };
 #endif

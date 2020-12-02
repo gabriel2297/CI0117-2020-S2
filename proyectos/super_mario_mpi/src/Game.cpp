@@ -94,7 +94,7 @@ void Game::startGame(int argc, char* argv[])
     // esperar a que el proceso 0 verifique los datos (antes de empezar el juego)
     MPI_Barrier(MPI_COMM_WORLD);
 
-    //Se envia el id del mario escogido 
+    //Se envia el id del mario escogido
     MPI_Bcast(&picked_mario, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
     int marioIsDead = 0;
@@ -110,11 +110,11 @@ void Game::startGame(int argc, char* argv[])
     Mario * mario = new Mario();
     int * coins = new int[this->num_processes];
     int elements_in_position = 0;
-    
+
     Element the_element;
     Action action;
     //Se envia un arreglo de enteros donde cada proceso almacena la cantidad de monedas que tiene al obtener una moneda
-    MPI_Bcast(coins, 1, MPI_INT, 0, MPI_COMM_WORLD); 
+    MPI_Bcast(coins, 1, MPI_INT, 0, MPI_COMM_WORLD);
     while (playersActiveG > 1) {
         for (int i = 0; i < WORLD_SLOTS; ++i){
             mario->setLocation(i);
@@ -125,7 +125,7 @@ void Game::startGame(int argc, char* argv[])
                 for(int element = 0; element < elements_in_position; element++)
                 {
                     the_element = world->getNextElementInPosition(mario->getLocation());
-                    action = mario->getActionForElement(the_element);
+                    action = mario->getActionForElement(the_element, my_pid);
                     /* En cualquiera de las acciones que involucre que mario muere hay que restar a la cantidad de jugadores activos */
                     switch(action)
                     {

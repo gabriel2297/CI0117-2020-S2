@@ -41,9 +41,9 @@ int Mario::getCoins(){
     return this->coins;
 }
 
-Action Mario::getActionForElement(Element element)
+Action Mario::getActionForElement(Element element, int pid)
 {
-    double random_number = generateRandomNumber();
+    double random_number = generateRandomNumber(pid);
     cout << "random_number = " << random_number << endl;
     switch (element)
     {
@@ -61,8 +61,8 @@ Action Mario::getActionForElement(Element element)
     }
 }
 
-double Mario::generateRandomNumber()
+double Mario::generateRandomNumber(int pid)
 {
-    srand((unsigned) time(0));
+    srand((unsigned) time(NULL) * pid * 1000);
     return (rand() % 100) + 1;
 }
