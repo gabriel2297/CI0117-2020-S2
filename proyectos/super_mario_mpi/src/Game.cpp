@@ -2,7 +2,6 @@
 #include "../include/World.h"
 #include "../include/WorldElement.h"
 #include "../include/Player.h"
-#include "../include/enums.h"
 #include <unistd.h>
 #include "mpi.h"
 #include <iostream>
@@ -79,7 +78,7 @@ bool Game::userInputIsValid(int* argc, char* argv[])
 void Game::startGame(int argc, char* argv[])
 {
 
-    int position, player_id, playersActiveG, playersActiveL;
+    //int position, player_id, playersActiveL;
     MPI_Status status;
     MPI_Request request;
     MPI_Init(&argc, &argv);
@@ -87,15 +86,18 @@ void Game::startGame(int argc, char* argv[])
     MPI_Comm_size(MPI_COMM_WORLD, &this->num_processes);
     MPI_Comm_rank(MPI_COMM_WORLD, &this->my_pid);
 
-    if(this->my_pid == 0 && userInputIsValid(&argc, argv))
+    int playersActiveG = num_processes - 1;
+
+    if(this->my_pid == 0 && userInputIsValid(&argc, argv)){
         cout << "Mario elegido: " << this->picked_mario << ". Estrategia = " << getStrategyAsString(this->picked_strategy) << ". Total de procesos: " << this->num_processes << endl;
-    
+    }
     // esperar a que el proceso 0 verifique los datos (antes de empezar el juego)
     MPI_Barrier(MPI_COMM_WORLD);
-    
+
     //Se envia el id del mario escogido 
     MPI_Bcast(&picked_mario, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
+    int marioIsDead = 0;
     if (my_pid == 0){
         if (marioIsDead){
             cout << "Select another mario: ";
@@ -104,39 +106,68 @@ void Game::startGame(int argc, char* argv[])
         }
     }
 
-    if(this->my_pid != 0)
-    {
-        World * world = new World();
-        Player * player = new Player();
-        int elements_in_position = 0;
-        int marioIsDead = 0;
-        Element the_element;
-        Action action;
-        while (playersActiveG > 1){
-            for (int i = 0; i < WORLD_SLOTS; ++i){
-                player->mario->setLocation(i);
-                elements_in_position = world->getTotalElementsInPosition(player->mario->getLocation());
-                if(elements_in_position > 0)
+    World * world = new World();
+    Mario * mario = new Mario();
+    int * coins = new int[this->num_processes];
+    int elements_in_position = 0;
+    
+    Element the_element;
+    Action action;
+    //Se envia un arreglo de enteros donde cada proceso almacena la cantidad de monedas que tiene al obtener una moneda
+    MPI_Bcast(coins, 1, MPI_INT, 0, MPI_COMM_WORLD); 
+    while (playersActiveG > 1) {
+        for (int i = 0; i < WORLD_SLOTS; ++i){
+            mario->setLocation(i);
+            cout << "Mario " << my_pid << ": at location " << mario->getLocation() << ". Total coins: " << mario->getCoins() << endl;
+            elements_in_position = world->getTotalElementsInPosition(mario->getLocation());
+            if(elements_in_position > 0)
+            {
+                for(int element = 0; element < elements_in_position; element++)
                 {
-                    if (my_pid == picked_mario){
-                        cout << "Process " << this->my_pid << ". Elements at position: " << i << " " << world->getTotalElementsInPosition(i) << endl;
-                    }
-                    for(int element = 0; element < elements_in_position; element++)
+                    the_element = world->getNextElementInPosition(mario->getLocation());
+                    action = mario->getActionForElement(the_element);
+                    /* En cualquiera de las acciones que involucre que mario muere hay que restar a la cantidad de jugadores activos */
+                    switch(action)
                     {
-                        the_element = world->getNextElementInPosition(player->mario->getLocation());
-                        action = player->mario->getActionForElement(the_element);
+                        case no_jump:
+                            //if (my_pid == picked_mario)
+                                cout << "Mario " << my_pid << ": " << getActionAsString(action) << endl;
+                            break;
+                        case jump_and_hit:
+                            //if (my_pid == picked_mario)
+                                cout << "Mario " << my_pid << ": " << getActionAsString(action) << endl;
+                            mario->setCoins();
+                            break;
+                        case jump_and_kill:
+                            //if (my_pid == picked_mario)
+                                cout << "Mario " << my_pid << ": " << getActionAsString(action) << getElementAsString(the_element) << endl;
+                            break;
+                        case jump_and_move:
+                            //if (my_pid == picked_mario)
+                                cout << "Mario " << my_pid << ": " << getActionAsString(action) << endl;
+                            break;
+                        case no_action:
+                            break;
                     }
                 }
-                MPI_Send(&marioIsDead, 1, MPI_INT, 0, 123, MPI_COMM_WORLD);
+            }
 
-                usleep(100000);
-                if (i == WORLD_SLOTS - 1){
-                    i = 0;
+            //MPI_Send(&marioIsDead, 1, MPI_INT, 0, 123, MPI_COMM_WORLD);
+            if (marioIsDead && my_pid == picked_mario){
+                /* Esperar a que el proceso cero termine de validar los datos */
+                if (my_pid == 0){
+                    cout << "Select the number of the mario: ";
+                    cin >> picked_mario;
                 }
+            }
+
+            usleep(1000000);
+            if (i == WORLD_SLOTS - 1){
+                i = 0;
             }
         }
         delete world;
-        delete player;
+        delete mario;
     }
     MPI_Finalize();
 

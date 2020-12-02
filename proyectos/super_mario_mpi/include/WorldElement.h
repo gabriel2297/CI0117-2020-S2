@@ -6,10 +6,10 @@
 class WorldElement
 {
     private:
-        Action action;
-
+        double NO_JUMP;
+        double JUMP_AND_KILL;
+        double JUMP_AND_MOVE;
     public:
-        const virtual Action *getActions() = 0;
         virtual Action getActionBasedOnProbability(double probability) = 0;
 };
 

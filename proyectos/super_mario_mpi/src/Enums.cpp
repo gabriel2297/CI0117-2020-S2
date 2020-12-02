@@ -43,7 +43,7 @@ std::string getActionAsString(Action action)
         case jump_and_hit:
             return "Mario jumped and grabbed a coin!";
         case jump_and_kill:
-            return "Mario jumped and killed the opponent";
+            return "Mario jumped and killed the ";
         case jump_and_move:
             return "Mario jumped and moved to the next position";
         default:

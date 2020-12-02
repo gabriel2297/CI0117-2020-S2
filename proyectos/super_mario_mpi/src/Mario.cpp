@@ -1,11 +1,16 @@
 #include "../include/Mario.h"
-#include "WorldElements/Coin.cpp"
+
+using namespace std;
 
 Mario::Mario(){
     this->action = 0;
     this->alive = true;
     this->coins = 0;
     this->location = 0;
+    this->coins_object = new Coins();
+    this->holes_object = new Holes();
+    this->koopa_object = new KoopaTroopas();
+    this->goombas_object = new LittleGoombas();
 }
 
 Mario::~Mario(){
@@ -39,19 +44,20 @@ int Mario::getCoins(){
 Action Mario::getActionForElement(Element element)
 {
     double random_number = generateRandomNumber();
-    Coin coin;
+    cout << "random_number = " << random_number << endl;
     switch (element)
     {
         case Coin:
-            return coin.getActionBasedOnProbability(random_number);
+            return coins_object->getActionBasedOnProbability(random_number);
         case Hole:
-            break;
+            return holes_object->getActionBasedOnProbability(random_number);
         case LittleGoomba:
-            break;
+            return goombas_object->getActionBasedOnProbability(random_number);
         case KoopaTroopa:
-            break;
+            return koopa_object->getActionBasedOnProbability(random_number);
         default:
-            break;
+            cout << "An error ocurred at getActionForElement() in Mario" << endl;
+            return no_action;
     }
 }
 

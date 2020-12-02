@@ -13,6 +13,7 @@ enum Element
 };
 enum Action
 {
+    no_action,
     no_jump,
     jump_and_hit,
     jump_and_kill,
