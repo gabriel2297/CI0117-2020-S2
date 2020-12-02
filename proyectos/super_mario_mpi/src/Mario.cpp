@@ -44,7 +44,6 @@ int Mario::getCoins(){
 Action Mario::getActionForElement(Element element, int pid)
 {
     double random_number = generateRandomNumber(pid);
-    cout << "random_number = " << random_number << endl;
     switch (element)
     {
         case Coin:
