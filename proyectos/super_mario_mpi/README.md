@@ -1,195 +1,156 @@
 # CI0117 - Proyecto 2: *Battle Royale* de Procesos [super_mario_mpi]
 
-### Instrucciones generales
+## Estudiantes:
+- Gabriel Umaña Frías (C09913)
+- Emmanuel Zúñiga Chaves (B98729)
 
-**Fecha de entrega:** Viernes 4 de Diciembre 11:50pm.
+## Manual de usuario
+### Compilando el programa:
 
-### Introducción
-
-En este proyecto se implementará un [*battle royale*](https://es.wikipedia.org/wiki/Battle_royale_(videojuegos)#:~:text=1%20Concepto-,Concepto,a%20todos%20los%20dem%C3%A1s%20oponentes.) entre procesos, simulando una versión muy simplificada del juego [Super Mario Bross 35](https://www.nintendo.com/games/detail/super-mario-bros-35-switch/). Para ello se creará un programa en C++ o en C donde un jugador virtual simulará el recorrido de Mario a lo largo del primer mundo (1-1) de su versión original. Dicho programa deberá poder ejecutarse utilizando el estándar de Message Passing Interface (MPI) de forma que se puedan tener varios procesos simultáneamente simulando el juego e interactuando entre ellos. Puede ver un *gameplay* del juego Super Mario Bross 35 [aquí](https://www.youtube.com/watch?v=Z05l1bkDSbM&ab_channel=Jos%C3%A9Andr%C3%A9sMena).
-
-### Requerimientos de implementación
-
-* El programa debe contener todas las validaciones necesarias, principalmente para los valores ingresados por el usuario, de forma que se mantenga la integridad de la ejecución y se cumpla con los requerimientos.
-* La estructura y código del programa deben seguir buenas prácticas y se evaluará *clean code*: Aprovechamiento de orientación a objetos, separación de responsabilidades, métodos simples, no repetición de código, no uso variables globales y documentación interna.
-* No hay un límite sobre el número de procesos simultáneos, pero puede asumir que la funcionalidad se evaluará con más de 3 procesos y menos de 35.
-* El proceso 0 no será un jugador, sino que se utilizará como apoyo general del programa (i.e. obtención de inputs del usuario, anuncio del ganador, etc.). Los procesos del 1 al N serán jugadores del *battle royale*.
-* Toda la comunicación entre procesos se realizará utilizando MPI. Pueden usar cualquier función disponible del estándar MPI necesaria para lograr la funcionalidad y comunicación colectiva entre procesos: MPI_Bcast, MPI_Reduce, MPI_Scatter, MPI_Gather, MPI_Allgather, etc.
-* Asegúrense de no generar accesos inválidos ni fugas de memoria.
-* Este proyecto no requerirá tener una interfaz gráfica y la interacción (entradas y salidas) se podrá realizar siempre desde la terminal de línea de comandos.
-* El recorrido de Mario dentro de la simulación se limitará únicamente al primer mundo (1-1). Puede basarse en [esta imagen](http://www.mariouniverse.com/wp-content/img/maps/nes/smb/1-1.png) para representarlo en su programa. Éste se representará como un arreglo/lista que se recorrerá de forma cicular.
-* Los elementos del mundo de Super Mario a considerar para este proyecto son: *coin*, *little goomba*, *koopa troopa* y *hole* (ver detalles más adelante).
-* Las acciones de Mario se limitarán a las necesarias para interactuar con dichos objetos. Implemente la lógica necesaria para elegir la acción realizada basándose en probablidades.
-
-### Requerimientos de la simulación
-
-#### Mundo
-El mundo podrá ser representado como una colección de casillas (*slots*) donde cada casilla contiene cero o más elementos. Puede basarse en [esta imagen](http://www.mariouniverse.com/wp-content/img/maps/nes/smb/1-1.png) para representar el mundo en su programa. Por ejemplo, las primeras 40 casillas del mundo podrían distribuirse de la siguiente manera:
-
-![Mario World Array](http://jocan3.com/misc_images/mario_world_array.png)
-
-0 = empty |
-1 = empty |
-2 = empty |
-3 = empty |
-4 = empty |
-5 = empty |
-6 = empty |
-7 = empty |
-8 = empty |
-9 = coin |
-10 = empty |
-11 = empty |
-12 = [little_goomba, coin, coin] |
-13 = empty |
-14 = empty |
-15 = empty |
-16 = empty |
-17 = empty |
-18 = empty |
-19 = empty |
-20 = empty |
-21 = [little_goomba] |
-... |
-26 = [little_goomba] |
-27 = [little_goomba] |
-... |
-35 = [hole] |
-36 = [hole] |
-... |
-
-Note que no todos los elementos de la imagen serán requeridos para efectos de este proyecto. Cuando Mario llega al final del mundo (Bandera), éste volverá a empezar desde la casilla 0.
-
-#### Elementos del Mundo
-
-![Coin](http://jocan3.com/misc_images/coin.png) *coin*
-
-Representa un bloque flotante con signo de interrogación. Cuando Mario encuentra este elemento, pueden suceder las siguientes acciones:
-
-* Mario no salta (Probabilidad 0.5). Esta acción no tienen ningún efecto.
-* Mario salta y golpea el bloque (Probabilidad 0.5). Mario obtiene una moneda.
-
-![Hole](http://jocan3.com/misc_images/hole.png) *hole*
-
-Representa un hoyo en el camino. Cuando Mario encuentra este elemento, pueden suceder las siguientes acciones:
-
-* Mario no salta (Probabilidad 0.05). Mario cae y el juego termina (Game Over).
-* Mario salta y pasa (Probabilidad 0.95). Esta acción no tienen ningún efecto.
-
-![Litte goomba](http://jocan3.com/misc_images/goomba.png) *little goomba*
-
-Representa un enemigo. Cuando Mario encuentra este elemento, pueden suceder las siguientes acciones:
-
-* Mario no salta (Probabilidad 0.05). Mario muere y el juego termina (Game Over).
-* Mario salta y pasa (Probabilidad 0.55). Esta acción no tienen ningún efecto.
-* Mario salta y mata al enemigo (Probabilidad 0.40). Esta acción tiene efectos descritos más adelante.
-
-![koopa troopa](http://jocan3.com/misc_images/koopa_troopa.png) *koopa troopa*
-
-Representa un enemigo. Cuando Mario encuentra este elemento, pueden suceder las siguientes acciones:
-
-* Mario no salta (Probabilidad 0.10). Mario muere y el juego termina (Game Over).
-* Mario salta y pasa (Probabilidad 0.53). Esta acción no tienen ningún efecto.
-* Mario salta y mata al enemigo (Probabilidad 0.37). Esta acción tiene efectos descritos más adelante.
-
-#### Mario
-Mario representa al jugador. Tendrá un atributo número de monedas que inicialmente estará en 0. Mientras el jugador esté *activo*, Mario se irá moviendo por las casillas del mundo. En el momento en que la casilla tenga elementos, Mario deberá realizar una acción sobre cada uno de los elementos en esa casilla (sólamente podrá realizar acciones que sean posibles sobre el elemento y basándose en la probabilidad especificada en la sección anterior).
-
-Observe que no se considerarán elementos tales como hongos, por lo que Mario sólamente tiene una vida. En el momento que ocurra un fin de juego (Game Over), Mario no podrá continuar jugando y el jugador pasará a estado *inactivo*.
-
-El programa deberá mostrar en todo momento cada una de las acciones de Mario, la casilla del Mundo en la que se encuentra y sus atributos. Por ejemplo:
-
+El código fuente del programa se encuentra en GitHub.  Requerimientos para poder correr la solución:
+1. Sistema Operativo Ubuntu 14.04 o superior.
+2. Instalación del GNU Compiler (gcc) y de  “make”. Para instalar, abrir el terminal del equipo y correr:
 ```
-World pos. 7: Mario is walking. Coins: 0
-World pos. 8: Mario is walking. Coins: 0
-World pos. 9: Mario jumped and grabbed a coin!. Coins: 0
-World pos. 10: Mario is walking. Coins: 1
-World pos. 11: Mario is walking. Coins: 1
-World pos. 12: Mario jumped and grabbed a coin!. Coins: 1
-World pos. 12: Mario didn't grab a coin. Coins: 2
-World pos. 12: Mario didn't jump and was killed by a little goomba. Coins: 2
-Game Over.
+❯ sudo apt update
+❯ sudo apt install build-essential
+```
+3. Para verificar que se haya instalado correctamente, al correr los siguientes comandos debemos obtener un resultado similar
+```
+❯ which gcc
+/usr/bin/gcc
+❯ which make
+/usr/bin/make
+```
+4. Para poder correr el programa con MPI necesitaremos las bibliotecas externas que lo implementen, sea open-mpi o mpichl, podemos instalarlas con los comandos:
+```
+❯ sudo apt-get install -y mpich 
+❯ sudo apt-get install -y openmpi-bin
+```
+5. Una vez instaladas las utilidades, proceder a moverse a la carpeta donde se encuentra descargado el proyecto y correr el comando “make”. Hecho esto, se puede correr el programa. Una ventana aparecera. 
+```
+❯ make
+mpic++ -O0 -g -Wall main.cpp src/*.cpp -o super_mario_mpi
+```
+### Como utilizar el programa 
+
+Una vez realizadas las instrucciones especificadas anteriormente se debe de correr el programa con el siguiente comando.
+```
+❯ mpiexec -n 5 --oversubscribe ./super_mario_mpi Mario "Strategy" 
+```
+Donde los argumentos Mario y Strategy corresponden al mario a monitorear durante la ejecución y a la estrategia del mismo. El Mario seleccionado debe debe de encontrarse en el intervalo [1, n - 1] donde n corresponde a la cantidad de procesos. Por otro lado, el argumento de Strategy define cual será la estrategia del mario seleccionado, a continuación se presentan las estrategias disponibles:
+
+* R. aleatorio (*random*): Jugador A ataca aleatoriamente a un jugador activo B cada vez que elimina un enemigo.
+* L. menos monedas (*less coins*): Jugador A ataca siempre al jugador activo que tenga menos monedas (si hay empate, se elige solamente 1).
+* M. más monedas (*more coins*): Jugador A ataca siempre al jugador activo que tenga más monedas (si hay empate, se elige solamente 1).
+* A. atacante (*attacker*): Jugador A ataca a uno de los jugadores atacantes cada vez que elimina un enemigo (si no hay atacantes, se elije aleatoriamente a un jugador activo B)
+
+[Demostracion de ejecucion en terminal]
+```
+$ mpiexec -n 5 --oversubscribe ./super_mario_mpi 3 L
+Mario elegido: 4. Estrategia = less_coins. Total de procesos: 4
+Mario 3
+ 
 ```
 
-Note que esta salida no debe ser la salida del programa final ya que no incluye informacion sobre la interacción con otros procesos (ver siguiente sección).
+Una vez terminada la ejecución se mostrará cual ha sido el Mario ganador.
 
-### Requerimientos del Battle Royale
+## Detalles de la solucion
+### Estructura del programa
 
-* Varios jugadores (procesos) estarán ejecutando la simulación al mismo tiempo. Cada uno tendrá su propio Mundo y su propio Mario.
-* Cuando un jugador A ataca a un jugador B, significa que todos los enemigos que A elimine en su mundo serán enviados al mundo de B. Por ejemplo, si Mario del jugador A mata a un *little goomba*, entonces en el mundo del jugador B aparecerá un *little goomba* extra (este **aparecerá 10 casillas adelante** con respecto a la posición actual de Mario del jugador B).
-* En todo momento, cada jugador activo deberá estar siempre atacando a otro jugador activo.
-* Hay 4 estrategias para atacar:
-  * R. aleatorio (*random*): Jugador A ataca aleatoriamente a un jugador activo B cada vez que elimina un enemigo.
-  * L. menos monedas (*less coins*): Jugador A ataca siempre al jugador activo que tenga menos monedas (si hay empate, se elige solamente 1).
-  * M. más monedas (*more coins*): Jugador A ataca siempre al jugador activo que tenga más monedas (si hay empate, se elige solamente 1).
-  * A. atacante (*attacker*): Jugador A ataca a uno de los jugadores atacantes cada vez que elimina un enemigo (si no hay atacantes, se elije aleatoriamente a un jugador activo B)
-* La estrategia a utilizar se elige aleatoriamente para cada jugador antes de iniciar.
-* Durante una partida sólamente se mostrará la información de la simulación de un jugador. Dicha información debe incluir el atacante y el objetivo, su estrategia de ataque, así como el total jugadores activos. El usuario elige cuál jugador visualizar al ejecutar el programa y cuál será la estrategia de ataque para ese jugador. Por ejemplo:
+La estructura del código se divide en el formato _src directory_ donde la distribución se realiza en tres carpetas principales dividiendo los ficheros de acorde al código fuente, heades y la documentación.
 
 ```
-$ mpiexec -n 5 ./super_mario_mpi 2 R
-World pos. 0: Mario #2 is walking. Coins: 0 | atacking #3 | being attacked by #5 | attack strategy: RANDOM | Total playing: 4
-World pos. 1: Mario #2 is walking. Coins: 0 | atacking #3 | being attacked by #5 | attack strategy: RANDOM | Total playing: 4
-World pos. 2: Mario #2 is walking. Coins: 0 | atacking #1 | being attacked by #5 | attack strategy: RANDOM | Total playing: 4
-World pos. 3: Mario #2 is walking. Coins: 0 | atacking #3 | being attacked by #5 | attack strategy: RANDOM | Total playing: 4
-World pos. 4: Mario #2 is walking. Coins: 0 | atacking #1 | being attacked by #5 | attack strategy: RANDOM | Total playing: 4
-World pos. 5: Mario #2 is walking. Coins: 0 | atacking #4 | being attacked by #5 | attack strategy: RANDOM | Total playing: 4
-World pos. 6: Mario #2 is walking. Coins: 0 | atacking #4 | being attacked by #5 | attack strategy: RANDOM | Total playing: 4
-World pos. 7: Mario #2 is walking. Coins: 0 | atacking #4 | being attacked by #5 | attack strategy: RANDOM | Total playing: 4
-World pos. 8: Mario #2 is walking. Coins: 0 | atacking #5 | being attacked by #5 | attack strategy: RANDOM | Total playing: 4
-World pos. 9: Mario #2 jumped and grabbed a coin!. Coins: 0 | atacking #3 | being attacked by #5 | attack strategy: RANDOM | Total playing: 3
-World pos. 10: Mario #2 is walking. Coins: 1 | atacking #3 | being attacked by #5 | attack strategy: RANDOM | Total playing: 3
-World pos. 11: Mario #2 is walking. Coins: 1 | atacking #2 | being attacked by #5 | attack strategy: RANDOM | Total playing: 3
-World pos. 12: Mario #2 jumped and grabbed a coin!. Coins: 1 | atacking #3 | being attacked by #5 | attack strategy: RANDOM | Total playing: 3
-World pos. 12: Mario #2 didn't grab a coin. Coins: 2 | atacking #4 | being attacked by #5 | attack strategy: RANDOM | Total playing: 3
-World pos. 12: Mario #2 didn't jump and was killed by a little goomba. Coins: 2 | atacking #5 | being attacked by #5 | attack strategy: RANDOM | Total playing: 3
-World pos. 12: Mario #2 Game Over.
++--------------------------------
+|main.cpp
+|include/
+|    +- enums.h
+|    +- Game.h
+|    +- Mapper.h
+|    +- Mario.h
+|    +- World.h
+|    +- WorldElement.h
+|    +- WorldElements/
+|    |    + - Coins.h
+|    |    + - Holes.h
+|    |    + - KoopaTroopas.h
+|    |    + - LittleGoombas.h
+|src/
+|    +- Enums.cpp
+|    +- Game.cpp
+|    +- Mapper.cpp
+|    +- Mario.cpp
+|    +- World.cpp	
++--------------------------------
 ```
-* Si el jugador siendo mostrado termina (Game Over), el programa debe pedir al usuario indicar otro número de jugador activo para mostrar.
-* Cuando sólamente queda 1 jugador activo, la batalla (programa) termina y dicho jugador es anunciado como el ganador
+- `main.cpp`: El archivo principal es el archivo `main.cpp`, el cual se encarga de inicializar el juego haciendo un llamado a la clase Game. 
 
-### Documentación
+- `include/enums.h`: en el header file `enums` se especifican las entidades principales utilizadas para la interacción de Mario en el mundo sean Elementos, Estrategias o Acciones.
 
-La documentación del proyecto debe contener las siguientes secciones:
+- `include/Game.h`: en el header file `Game.h` se especifican las funciones necesarias para el funcionamiento correcto del juego, tales como la validacion de datos de entrada, obtencion de datos y otras tareas que los procesos deben de realizar para el correcto funcionamiento.
 
-* Manual de usuario: Incluir información sobre cómo compilar el código fuente y bibliotecas adicionales a instalar. Información sobre cómo utilizar el programa (entradas esperadas e interpretación de resultados).
+- `include/Mapper.h`: el header file `Mapper.h` funciona como una base de datos para la inicialización del mundo para insertar los elementos en las posiciones correspondientes.
 
-* Detalles de la solución: Estructura del programa (clases, folders, archivos, etc.) y breve descripción de cada uno de los componentes. Puede agregar un diagrama de componentes para representar la interacción entre los elementos.
+- `include/Mario.h`: en el header file `Mario.h` se definen los atributos y métodos que tiene el objeto Mario, siendo este el que interactua con los elementos del mundos. 
 
-* MPI: Para cada una de las funciones del estándar MPI utilizadas, explique brevemente su función dentro del programa.
+- `include/World.h`: en el header file `World.h` se encuentran los métodos y atributos necesarios para la inicialización del mundo.
 
-### Evaluación
-* Funcionalidad (50%)
-  * 5% Entradas y validación
-  * 5% Movimiento de Mario sobre el mundo
-  * 5% Muestra toda la información de Mario (monedas, atacantes, objetivos, estrategia, activos, ganador)
-  * 5% Integridad de la ejecución (programa no se cae, termina correctamente)
-  * 10% Interacción con objetos (monedas, enemigos, hoyos)
-  * 20% Manejo de las estrategias de ataque (aleatorio, +monedas, -monedas, atacantes)
+- `include/WorldElements.h`: en el header file `WorldElements.h` se define la clase abstracta de las cuales heredaran los elementos con los cuales Mario puede interactuar en el mundo.
 
-* Código (40%)
-  * 10% Clean code
-  * 10% Clases y estructuras de datos
-  * 15% Manejo de paso de mensajes (MPI)
-  * 05% Documentación interna
+- `include/WorldElements/Coins.h`: en el header file `Coins.h` se encuentra la definición e implementación de la clase derivada de WorldElements, aqui se especifican cual es el comportamiento y acciones que puede realizar Mario con las monedas en el mundo.
 
-* Documentación externa (10%)
+- `include/WorldElements/Holes.h`: en el header file `Holes.h` se encuentra la definición e implementación de la clase derivada de WorldElements, aqui se especifican cual es el comportamiento y acciones que puede realizar Mario con los agujeros en el mundo.
 
-* Creatividad en general (10 puntos extra sobre la nota del proyecto)
+- `include/WorldElements/KoopaTroopas.h`: en el header file `KoopaTroopas.h` se encuentra la definición e implementación de la clase derivada de WorldElements, aqui se especifican cual es el comportamiento y acciones que puede realizar Mario con los Koopa Troopas en el mundo.
 
-### Entrega
+- `include/WorldElements/LittleGoombas.h`: en el header file `LittleGoombas.h` se encuentra la definición e implementación de la clase derivada de WorldElements, aqui se especifican cual es el comportamiento y acciones que puede realizar Mario con los Little Goombas en el mundo.
 
-Este proyecto se podrá realizar en grupos de máximo 2 personas.
+- `src/Enums.cpp`: en el source file `Enums.cpp` se encuentra información en enums con las cuales se puede facilitar la comunicación entre Mario con el mundo, similarmente para que dicha información sea facilmenta mostrada durante la ejecución del juego.
 
-Las solución deberá ser subida a su repositorio *CI0117-2020-S2* creado para este curso en Github. Dentro de dicho repositorio se deberá crear un folder con el nombre *proyectos*. El nombre entre paréntesis cuadrados en el título del proyecto es el nombre a utilizar para el folder que contiene el proyecto.
-Toda la documentación solicitada deberá estar en un archivo README.md en el folder raíz del proyecto.
-El proyecto debe contener un archivo *Makefile* con los comandos necesarios para compilar el codigo fuente, de forma que el ejecutable tenga el nombre dado en el título. Cree un archivo .gitignore para evitar subir archivos ejecutables.
+- `src/Game.cpp`: en el source file `Game.cpp` se encuentra gran parte de la implementación lógica del juego, igualmente acá se lleva a cabo la comunicación entre procesos mediante MPI.
 
-Únicamente uno de los integrantes del grupo requiere subir la solución.
+- `src/Mapper.cpp`: en el source file `Mapper.cpp` se encuentra la implementación necesaria para inicializar cada instancia de un mundo, colocando los diferentes elementos en las posiciones correspondientes.
 
-### Material de apoyo:
+- `src/Mario.cpp`: en el source file `Mario.cpp` se encuentra la implementación del objeto Mario, el cual se encarga de interactuar con los diferentes elementos del mundo. De manera que cada proceso tiene una instancia a dicho objeto con los datos necesarios.
 
-* Estándar MPI - https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf
-* Guía de Referencia rápida MPI - https://os.ecci.ucr.ac.cr/ci0117/slides/mpi-quick-ref.pdf
-* Ejemplo de Gameplay Super Mario Bross 35 - https://www.youtube.com/watch?v=Z05l1bkDSbM&ab_channel=Jos%C3%A9Andr%C3%A9sMena.
-* Imagen del primer mundo de Super Mario original - http://www.mariouniverse.com/wp-content/img/maps/nes/smb/1-1.png
+- `src/World.cpp`: en el source file `World.cpp` se encuentra la implementación lógica de los métodos necesarios para que Mario sea capaz de recorrer el mundo e interactuar con el.
+
+
+### MPI
+
+A continuación se presentan las funciones estándar de MPI utilizadas para la solución y como estas funcionan en el programa
+
+```
+❯ MPI_Allgather()
+```
+Hace un gather de datos a un buffer de manera que todos los procesos tiene los datos agrupados en un arreglo. 
+En el programa es utilizado para enviar a un arreglo si el mario del proceso se encuentra vivo o no, de manera que todos los procesos pueden saber cual o cuales Marios se encuentran muertos.
+
+```
+MPI_Allgather(&this->mario_is_alive, 1, MPI_INT, processes_alive, 1, MPI_INT, MPI_COMM_WORLD);
+```
+A partir de los datos almacenados en el buffer se puede determinar cual es el Mario ganador o si el Mario seleccionado por el usuario se encuentra activo o no.
+
+```
+❯ MPI_Barrier()
+```
+Realiza un bloqueo parcial hasta que todos los procesos hayan llegado a dicha función.
+En el programa es utilizado principalmente cuando el proceso 0 debe de realizar alguna validación de datos, o bien llamar a la entrada estándar de C++
+```
+mario->setPickedMario(picked_mario);
+MPI_Barrier(MPI_COMM_WORLD);
+```
+Con esta función se impide que cuando el proceso 0 realiza alguna acción necesaria para el correcto funcionamiento del flujo de datos lo demás procesos sigan realizando las demás acciones.
+
+```
+❯ MPI_Bcast()
+```
+Permite enviar información desde un proceso raiz hacia los demás procesos.
+En el programa es utilizado cuando es necesario enviar los valores de ciertos datos en concreto necesarios para la ejecución. Por ejemplo, decirle a los demás procesos cual es el Mario que ha sido seleccionado por el usuario, o enviar un buffer de monedas.
+
+```
+MPI_Bcast(&picked_mario, 1, MPI_INT, 0, MPI_COMM_WORLD);
+```
+Con esta función se le envia a los demás procesos cual Mario ha sido seleccionado por el usuario.
+
+Estas funciones de MPI explicadas anteriormente fueron fundamentales para asegurar el debido envio y recibo de mensajes entre procesos, de manera que sea posible realizar una comunicación eficaz y que la ejecución del programa se cumpla correctamente.
+
