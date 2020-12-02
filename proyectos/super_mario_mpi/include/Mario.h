@@ -10,25 +10,30 @@
 
 class Mario {
     private:
+        int mario_id;
+        int picked_mario_id;
         int location;
         int coins;
         bool alive;
         int action;
-        Coins *coins_object;
-        Holes *holes_object;
-        KoopaTroopas *koopa_object;
-        LittleGoombas *goombas_object;
+        Coins coins_object;
+        Holes holes_object;
+        KoopaTroopas koopa_object;
+        LittleGoombas goombas_object;
     public:
-        Mario();
+        Mario(int);
         ~Mario();
         void setLocation(int);
         void setCoins();
         void setIsAlive(bool);
+        void setPickedMario(int);
+        int getMyId();
         int getLocation();
         int getCoins();
         bool isAlive();
+        bool iAmPickedMario();
         int chooseAction(int);
-        double generateRandomNumber(int);
-        Action getActionForElement(Element element, int);
+        double generateRandomNumber();
+        Action getActionForElement(Element element);
 };
 #endif
