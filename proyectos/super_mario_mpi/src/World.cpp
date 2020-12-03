@@ -50,7 +50,10 @@ int World::getTotalElementsInPosition(int index)
 Element World::getNextElementInPosition(int index)
 {
     if (this->world[index].empty())
+    {
+        cout << "no elements in getNextElementInposition" << endl;
         return None;
+    }
     switch (this->world[index].front())
     {
         case Coin:

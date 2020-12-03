@@ -12,6 +12,16 @@ Mario::Mario(int pid){
 
 Mario::~Mario(){}
 
+void Mario::setStrategy(Strategy strategy)
+{
+    this->picked_strategy = strategy;
+}
+
+Strategy Mario::getStrategy()
+{
+    return this->picked_strategy;
+}
+
 void Mario::setPickedMario(int id)
 {
     this->picked_mario_id = id;

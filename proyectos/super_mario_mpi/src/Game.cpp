@@ -9,6 +9,9 @@ using namespace std;
 
 Game::Game(){
     this->mario_is_alive = 1;
+    this->total_coins = 0;
+    this->mario_less_coins = 9999999;
+    this->mario_more_coins = 0;
 }
 Game::~Game(){}
 
@@ -125,51 +128,103 @@ void Game::printAliveProcesses()
 }
 
 /**
+ * Realizar una accion en un elemento, por cada posicion.
+ * @param action - accion a realizar 
+ * @param element - elemento sobre el cual realizamos la accion
+*/
+void Game::doActions(Action action, Element element)
+{
+    switch(action)
+    {
+        case no_jump:
+            if(mario->iAmPickedMario() && element == Coin)
+                    cout << "Mario " << mario->getMyId() << ": " << getActionAsString(action) << endl;
+            else if(element != Coin){
+                mario->setIsAlive(false);
+                this->mario_is_alive = mario->isAlive();
+                if (mario->iAmPickedMario())
+                    cout << "Mario " << mario->getMyId() << ": " << getActionAsString(action) << " and was killed by a " << getElementAsString(the_element) << endl;
+            }
+            break;
+        case jump_and_hit:
+            mario->setCoins();
+            ++this->total_coins;
+            if (mario->iAmPickedMario())
+                cout << "World pos. " << mario->getLocation() << ". Mario " << mario->getMyId() << getActionAsString(action) << ". Attack strategy: " << getStrategyAsString(this->picked_strategy) << ". Total playing: " << (getProcessesAlive()-1) << endl;
+            break;
+        case jump_and_kill:
+            if (mario->iAmPickedMario())
+                cout << "Mario " << my_pid << ": " << getActionAsString(action) << getElementAsString(element) << endl;
+            break;
+        case jump_and_move:
+            if (mario->iAmPickedMario())
+                cout << "Mario " << my_pid << ": " << getActionAsString(action) << endl;
+            break;
+        case no_action:
+            break;
+    }
+}
+
+/**
  * Metodo que se llama cada vez que Mario avanza de posicion
 */
 void Game::movePositions()
 {
-    if(mario->isAlive())
+    if(mario->isAlive() && mario->getMyId() != 0)
     {
-        if(mario->iAmPickedMario())
-            cout << "World pos. " << mario->getLocation() << ". Mario " << mario->getMyId() << " is walking." << endl;
-
         // obtener los elementos en la posicion en la que mario esta
         int elements_in_position = world->getTotalElementsInPosition(mario->getLocation());
 
         // mientras hayan elementos...
         while(elements_in_position > 0)
         {
-            // obtener el elemento y hacer algo con el
+            // obtener el elemento y la accion de ese elemento
             the_element = world->getNextElementInPosition(mario->getLocation());
             action = mario->getActionForElement(the_element);
-            switch(action)
-            {
-                case no_jump:
-                    if (mario->iAmPickedMario())
-                        cout << "Mario " << mario->getMyId() << ": " << getActionAsString(action) << endl;
-                    if(the_element != Coin){
-                        mario->setIsAlive(false);
-                        this->mario_is_alive = mario->isAlive();
-                    }
-                    break;
-                case jump_and_hit:
-                    mario->setCoins();
-                    if (mario->iAmPickedMario())
-                        cout << getActionAsString(action) << " Total coins: "  << mario->getCoins() << endl;
-                    break;
-                case jump_and_kill:
-                    if (mario->iAmPickedMario())
-                        cout << "Mario " << my_pid << ": " << getActionAsString(action) << getElementAsString(the_element) << endl;
-                    break;
-                case jump_and_move:
-                    if (mario->iAmPickedMario())
-                        cout << "Mario " << my_pid << ": " << getActionAsString(action) << endl;
-                    break;
-                case no_action:
-                    break;
-            }
+            
+            // realizar la accion, luego revisar si mario murio o no
+            doActions(action, the_element);
+            if(!mario->isAlive())
+                break;
+
+            // restarle 1 a la cantidad de elementos en la posicion 
+            --elements_in_position;
         }
+    }
+}
+
+void Game::printWinnerMario()
+{
+    for (int i = 0; i < this->num_processes; ++i)
+    {
+        if (processes_alive[i] == 1 && i != 0){
+            cout << "El Ganador es Mario " << i << "!!!" << endl;
+            break;
+        }
+    }
+}
+
+void Game::setCoinsPerProcess()
+{
+    for(int i = 0; i < this->num_processes; ++i)
+        coins_per_process[i] = 0; 
+}
+
+void Game::computeLessCoinsMario()
+{
+    for(int i = 0; i < this->num_processes; ++i)
+    {
+        if(coins_per_process[i] < this->mario_less_coins && i!=0)
+            this->mario_less_coins = i;
+    }
+}
+
+void Game::computeMoreCoinsMario()
+{
+    for(int i = 0; i < this->num_processes; ++i)
+    {
+        if(coins_per_process[i] > this->mario_more_coins && i!=0)
+            this->mario_more_coins = i;
     }
 }
 
@@ -185,11 +240,13 @@ void Game::startGame(int argc, char* argv[])
     MPI_Comm_rank(MPI_COMM_WORLD, &this->my_pid);
 
     // crear las variables a utilizar e instanciar objetos
-    int coins[this->num_processes];
+    this->coins_per_process = new int[this->num_processes];
     this->processes_alive = new int[this->num_processes];
     world = new World();
     mario = new Mario(this->my_pid);
     setProcessesAlive();
+    setCoinsPerProcess();
+    
 
     // validar la informacion del usuario e imprimir la informacion de lo elegido
     if(mario->getMyId() == 0 && userInputIsValid(&argc, argv))
@@ -198,25 +255,35 @@ void Game::startGame(int argc, char* argv[])
     // si el proceso != 0: esperar a que el 0 verifique los datos
     MPI_Barrier(MPI_COMM_WORLD);
 
-    // Se envia el id del mario escogido
+    // Se envia el id del mario escogido y la estrategia
     MPI_Bcast(&picked_mario, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&picked_strategy, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-    // Asigno el mario que es el elegido para imprimir
+    // Asigno el mario que es el elegido para imprimir y la estrategia elegida
     mario->setPickedMario(picked_mario);
+    mario->setStrategy(picked_strategy);
 
     // Se envia un arreglo de enteros donde cada proceso almacena la cantidad de monedas que tiene al obtener una moneda
-    MPI_Bcast(coins, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Allgather(&this->total_coins, 1, MPI_INT, coins_per_process, 1, MPI_INT, MPI_COMM_WORLD);
 
     // mientras hayan posiciones en el mundo y la cantidad de procesos sea mayor a 2 (2 = el 0 y el ganador)
     int i = 0; 
     while(i < WORLD_SLOTS && getProcessesAlive() > 2)
     {
+        computeLessCoinsMario();
+        computeMoreCoinsMario();
+
         // recorrer el mundo
         mario->setLocation(i);
+
+        if(mario->iAmPickedMario())
+            cout << "World pos. " << mario->getLocation() << ". Mario " << mario->getMyId() << " is walking. Attack strategy: " << getStrategyAsString(this->picked_strategy) << ". Total playing: " << (getProcessesAlive()-1) << endl;
+        
         movePositions();
         
-        // reportar a todos los otros procesos mi estado
+        // reportar a todos los otros procesos mi estado y la cantidad de monedas
         MPI_Allgather(&this->mario_is_alive, 1, MPI_INT, processes_alive, 1, MPI_INT, MPI_COMM_WORLD);
+        MPI_Allgather(&this->total_coins, 1, MPI_INT, coins_per_process, 1, MPI_INT, MPI_COMM_WORLD);
 
         /* Esperar a que el proceso cero termine de validar los datos */
         if (mario->getMyId() == 0 && processes_alive[getChosenMario()] == 0 && getProcessesAlive() > 2)
@@ -235,12 +302,9 @@ void Game::startGame(int argc, char* argv[])
         
         ++i;
     }
-    
-    for (int i = 0; i < num_processes; ++i){
-        if (i != 0 && processes_alive[i] != 0 && mario->getMyId() == i){
-            cout << "El Ganador es el: " << i << endl;
-        }
-    }
+
+    if(my_pid == 0)
+        printWinnerMario();
 
     MPI_Finalize();
     delete world;

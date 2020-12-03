@@ -12,6 +12,7 @@ class Mario {
     private:
         int mario_id;
         int picked_mario_id;
+        Strategy picked_strategy;
         int location;
         int coins;
         bool alive;
@@ -27,6 +28,8 @@ class Mario {
         void setCoins();
         void setIsAlive(bool);
         void setPickedMario(int);
+        void setStrategy(Strategy);
+        Strategy getStrategy();
         int getMyId();
         int getLocation();
         int getCoins();
