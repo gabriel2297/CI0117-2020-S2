@@ -14,11 +14,17 @@ class Game
         int my_pid;
         int * processes_alive;
         int * coins_per_process;
+        int * attacking_processes;
+        int * koopas_received;
+        int * goombas_received;
+        int koopas;
+        int goombas;
         double start_time, end_time;
         int mario_is_alive;
         int total_coins;
         int mario_less_coins;
         int mario_more_coins;
+        int mario_random;
         Strategy picked_strategy;
         Element the_element;
         Action action;
@@ -36,7 +42,9 @@ class Game
         void printWinnerMario();
         void computeLessCoinsMario();
         void computeMoreCoinsMario();
-        void setCoinsPerProcess();
+        void initCoinsPerProcess();
+        void computeReceivedElements();
+        void restartEnemiesPerProcessCounters();
     public:
         void startGame(int argc, char* argv[]);
         Game();

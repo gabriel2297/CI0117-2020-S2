@@ -38,5 +38,6 @@ class Mario {
         int chooseAction(int);
         double generateRandomNumber();
         Action getActionForElement(Element element);
+        void generateRandomStrategy();
 };
 #endif

@@ -86,3 +86,16 @@ double Mario::generateRandomNumber()
     srand((unsigned) time(NULL) * getMyId() * 1000);
     return (rand() % 100) + 1;
 }
+
+void Mario::generateRandomStrategy(){
+    srand((unsigned) time(NULL) * getMyId() * 1000);
+    double random_number = generateRandomNumber();
+    if(random_number >= 75)
+        this->setStrategy(random_strategy);
+    else if (random_number >= 50 && random_number < 75)
+        this->setStrategy(less_coins);
+    else if (random_number >= 25 && random_number < 50)
+        this->setStrategy(more_coins);
+    else 
+        this->setStrategy(attacker);       
+}
