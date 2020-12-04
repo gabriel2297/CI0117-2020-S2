@@ -7,9 +7,11 @@ Mario::Mario(int pid){
     this->alive = true;
     this->coins = 0;
     this->location = 0;
+    this->koopas_count = 0;
+    this->goombas_count = 0;
     this->mario_id = pid;
-    setMarioWithLessCoins(1, 99999);
-    setMarioWithMoreCoins(1, 0);
+    setMarioWithMoreCoins(1);
+    setMarioWithLessCoins(1);
 }
 
 Mario::~Mario(){}
@@ -24,10 +26,9 @@ Strategy Mario::getStrategy()
     return this->picked_strategy;
 }
 
-void Mario::setMarioWithLessCoins(int process, int total_coins)
+void Mario::setMarioWithLessCoins(int process)
 {
     this->mario_with_less_coins = process;
-    this->total_less_coins = total_coins;
 }
 
 int Mario::getMarioWithLessCoins()
@@ -35,25 +36,14 @@ int Mario::getMarioWithLessCoins()
     return this->mario_with_less_coins;
 }
 
-void Mario::setMarioWithMoreCoins(int process, int total_coins)
+void Mario::setMarioWithMoreCoins(int process)
 {
     this->mario_with_more_coins = process;
-    this->total_more_coins = total_coins;
 }
 
 int Mario::getMarioWithMoreCoins()
 {
     return this->mario_with_more_coins;
-}
-
-int Mario::getTotalLessCoins()
-{
-    return this->total_less_coins;
-}
-
-int Mario::getTotalMoreCoins()
-{
-    return this->total_more_coins;
 }
 
 void Mario::setPickedMario(int id)
@@ -154,15 +144,13 @@ void Mario::chooseEnemy(int limit, int attacked_by)
             setEnemy(random_enemy_picker);
             break;
         case attacker:
-            if(attacked_by == 0){
-                while(random_enemy_picker == getMyId() || random_enemy_picker == 0)
-                    setEnemy(random_enemy_picker);
-            }
-            else
-                setEnemy(attacked_by);
+            while(random_enemy_picker == getMyId() || random_enemy_picker == 0)
+                random_enemy_picker = generateRandomNumber(limit);
+            setEnemy(random_enemy_picker);
             break;
         default:
-            cout << "Error en chooseEnemy()" << endl;
+            if(getMyId() != 0)
+                cout << "Error en chooseEnemy()" << endl;
             break;
     }
 }
@@ -175,4 +163,24 @@ void Mario::setEnemy(int enemy_id)
 int Mario::getEnemy()
 {
     return this->chosen_enemy;
+}
+
+void Mario::setKoopas() 
+{
+    this->koopas_count++;
+}
+
+void Mario::setGoombas()
+{
+    this->goombas_count++;
+}
+
+int Mario::getKoopas()
+{
+    return this->koopas_count;
+}
+
+int Mario::getGoombas()
+{
+    return this->goombas_count;
 }

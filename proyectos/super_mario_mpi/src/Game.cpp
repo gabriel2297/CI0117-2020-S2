@@ -10,7 +10,7 @@ using namespace std;
 Game::Game(){
     this->mario_is_alive = 1;
     this->total_coins = 0;
-    this->mario_less_coins = 9999999;
+    this->mario_less_coins = 0;
     this->mario_more_coins = 0;
     this->koopas = 0;
     this->goombas = 0;
@@ -77,6 +77,7 @@ bool Game::userInputIsValid(int* argc, char* argv[])
     }
 
     this->picked_mario = atoi(argv[1]);
+    
 
     if(getChosenMario() > this->num_processes || getChosenMario() <= 0){
         cout << "El id del Mario elegido no existe" << endl;
@@ -100,7 +101,7 @@ bool Game::userInputIsValid(int* argc, char* argv[])
 int Game::getProcessesAlive()
 {   
     int counter = 0;
-    for(int i = 0; i < this->num_processes; ++i)
+    for(int i = 1; i < this->num_processes; ++i)
     {
         if(this->processes_alive[i] == 1)
             counter++;
@@ -108,12 +109,17 @@ int Game::getProcessesAlive()
     return counter;
 }
 
+bool Game::isProcessAlive(int pid)
+{
+    return (this->processes_alive[pid] == 1) ? true : false;
+}
+
 /**
  * Sets all processes in the game as alive
 */
 void Game::setProcessesAlive()
 {
-    for(int i = 0; i < this->num_processes; ++i)
+    for(int i = 1; i < this->num_processes; ++i)
         this->processes_alive[i] = 1;
 }
 
@@ -123,50 +129,9 @@ void Game::setProcessesAlive()
 */
 void Game::printAliveProcesses()
 {
-    for(int i = 0; i < this->num_processes; ++i)
+    for(int i = 1; i < this->num_processes; ++i)
     {
         cout << "Process " << i << " is " << this->processes_alive[i] << endl;
-    }
-}
-
-void Game::distributeElementsForEnemy(Element element)
-{
-    switch(element)
-    {
-        case KoopaTroopa:
-            this->koopas_received[mario->getEnemy()] = this->koopas;
-            break;
-        case LittleGoomba:
-            this->goombas_received[mario->getEnemy()] = this->goombas;
-            break;
-        default:
-            cout << "error en funcion distributeElementsForEnemy()" << endl;
-             break;
-    }
-}
-
-void Game::getElementsFromEnemies()
-{
-    int goombas_received = this->goombas_received[mario->getMyId()];
-    int koopas_received = this->koopas_received[mario->getMyId()];
-}
-
-void Game::printMariosActionBasedOnElement(Action action, Element element)
-{
-    switch(element)
-    {
-        case KoopaTroopa:
-            cout << "World pos. " << mario->getLocation() << ". Mario " << mario->getMyId() << getActionAsString(action) <<  ". Attack strategy: " << getStrategyAsString(this->picked_strategy) << ". Total playing: " << (getProcessesAlive()-1) << endl;
-            break;
-        case LittleGoomba:
-            cout << "World pos. " << mario->getLocation() << ". Mario " << mario->getMyId() << getActionAsString(action) << ". Attack strategy: " << getStrategyAsString(this->picked_strategy) << ". Total playing: " << (getProcessesAlive()-1) << endl;
-            break;
-        case Coin:
-            cout << "World pos. " << mario->getLocation() << ". Mario " << mario->getMyId() << getActionAsString(action) << ". Attack strategy: " << getStrategyAsString(this->picked_strategy) << ". Total playing: " << (getProcessesAlive()-1) << endl;
-            break;
-        default:
-            cout << "World pos. " << mario->getLocation() << ". Mario " << mario->getMyId() << getActionAsString(action) << ". Attack strategy: " << getStrategyAsString(this->picked_strategy) << ". Total playing: " << (getProcessesAlive()-1) << endl;
-            break;
     }
 }
 
@@ -180,7 +145,13 @@ void Game::doActions(Action action, Element element)
     switch(action)
     {
         case no_jump:
-            
+            if(element != Coin)
+            {
+                mario->setIsAlive(false);
+                this->mario_is_alive = mario->isAlive();
+                if(mario->iAmPickedMario())
+                    cout << "World pos. " << mario->getLocation() << ". Mario " << mario->getMyId() << getActionAsString(action) << " and was killed by a " << getElementAsString(element) <<  ". Attack strategy: " << getStrategyAsString(this->picked_strategy) << ". Total playing: " << (getProcessesAlive()-1) << endl;
+            }
             break;
         case jump_and_hit:
             mario->setCoins();
@@ -189,28 +160,20 @@ void Game::doActions(Action action, Element element)
                 cout << "World pos. " << mario->getLocation() << ". Mario " << mario->getMyId() << getActionAsString(action) <<  " Attack strategy: " << getStrategyAsString(this->picked_strategy) << ". Total playing: " << (getProcessesAlive()-1) << endl;
             break;
         case jump_and_kill:
-            if (element == KoopaTroopa)
-            {
-                this->koopas+=1;
-                cout << "World pos. " << mario->getLocation() << ". Mario " << mario->getMyId() << getActionAsString(action) << getElementAsString(element) <<  ". Attack strategy: " << getStrategyAsString(this->picked_strategy) << ". Total playing: " << (getProcessesAlive()-1) << endl;            
-                distributeElementsForEnemy(element);
-                break;
+            if (element == LittleGoomba){
+                mario->setGoombas(); //Aumenta 1 a la cantidad de goombas del mario
+                ++this->goombas;
+            } else if (element == KoopaTroopa){
+                mario->setKoopas(); //Aumenta 1 a la cantidad de koopas del mario
+                ++this->koopas;
             }
-            else if (element == LittleGoomba)
-            {
-                this->goombas += 1;
-                cout << "World pos. " << mario->getLocation() << ". Mario " << mario->getMyId() << getActionAsString(action) << getElementAsString(element) <<  ". Attack strategy: " << getStrategyAsString(this->picked_strategy) << ". Total playing: " << (getProcessesAlive()-1) << endl;            
-                distributeElementsForEnemy(element);
-                break;
-            }
-            else{
-                break;
-            }
+            if (mario->iAmPickedMario())
+                cout << "World pos. " << mario->getLocation() << ". Mario " << mario->getMyId() << getActionAsString(action) <<  getElementAsString(element) <<  " Attack strategy: " << getStrategyAsString(this->picked_strategy) << ". Total playing: " << (getProcessesAlive()-1) << endl;
+            break;
         case jump_and_move:
             if (mario->iAmPickedMario())
                 cout << "World pos. " << mario->getLocation() << ". Mario " << mario->getMyId() << getActionAsString(action) <<  ". Attack strategy: " << getStrategyAsString(this->picked_strategy) << ". Total playing: " << (getProcessesAlive()-1) << endl;
             break;
-
         case no_action:
             break;
     }
@@ -253,80 +216,37 @@ void Game::printWinnerMario()
     }
 }
 
-void Game::initCoinsPerProcess()
+void Game::initStructuresPerProcess()
 {
     for(int i = 0; i < this->num_processes; ++i)
+    {
         coins_per_process[i] = 0;
-}
-
-void Game::restartEnemiesPerProcessCounters()
-{
-    this->koopas = 0;
-    this->goombas = 0;
-}
-
-void Game::initElementsSentByOthers()
-{
-    for(int i = 0; i < this->num_processes; ++i)
-    {
-        this->koopas_to_send[i] = 0;
-        this->goombas_to_send[i] = 0;
-        this->koopas_received[i] = 0;
-        this->goombas_received[i] = 0;
+        koopas_per_process[i] = 0;
+        goombas_per_process[i] = 0;
+        attacking_processes[i] = 0;
     }
 }
 
-void Game::computeLessCoinsMario()
+void Game::computeCoinsPerMario()
 {
-    for(int i = 0; i < this->num_processes; ++i)
+    int min = 999999;
+    int max = 0;
+    for(int i = 1; i < this->num_processes; ++i)
     {
-        if(coins_per_process[i] < mario->getTotalLessCoins() && i!=0)
-            mario->setMarioWithLessCoins(i, coins_per_process[i]);
-    }
-}
-
-void Game::computeMoreCoinsMario()
-{
-    for(int i = 0; i < this->num_processes; ++i)
-    {
-        if(coins_per_process[i] > mario->getTotalMoreCoins() && i!=0)
-            mario->setMarioWithMoreCoins(i, coins_per_process[i]);
-    }
-}
-
-void Game::computeReceivedElements()
-{
-    int index = mario->getMyId();
-    int current_position = mario->getLocation();
-    int add_to_position = ((current_position + 10) > WORLD_SLOTS) ? ((current_position+10) - WORLD_SLOTS) : (current_position+10);
-    int total_koopas = this->koopas_received[index];
-    int total_goombas = this->goombas_received[index];
-    cout << "total_koopas " << total_koopas << " para mario " << mario->getMyId() << endl;
-    cout << "total_goombas " << total_goombas << " para mario " << mario->getMyId() << endl;
-    while(total_koopas > 0)
-    {
-        world->pushElement(KoopaTroopa, add_to_position);
-        --total_koopas;
-    }
-    while(total_goombas > 0)
-    {
-        world->pushElement(LittleGoomba, add_to_position);
-        --total_goombas;
-    }
-}
-
-int Game::getBeingAttackedBy()
-{
-    int attacked_by_process = 1;
-    for(int i = 0; i < this->num_processes; ++i)
-    {
-        if(this->attacking_processes[i] == this->my_pid && this->attacking_processes[i] != 0 && i != 0)
+        if(isProcessAlive(i) && i != 0 && i != mario->getMyId())
         {
-            attacked_by_process = i;
-            break;
+            if (min > coins_per_process[i]){
+                min = coins_per_process[i];
+                this->mario_less_coins = i;
+            }
+            if (coins_per_process[i] > max){
+                max = coins_per_process[i];
+                this->mario_more_coins = i;
+            }
         }
     }
-    return attacked_by_process;
+    cout << "Proceso con mas monedas = " << this->mario_more_coins << endl;
+    cout << "Proceso con menos monedas = " << this->mario_less_coins << endl;
 }
 
 /**
@@ -343,17 +263,14 @@ void Game::startGame(int argc, char* argv[])
     // crear las variables a utilizar e instanciar objetos
     this->coins_per_process = new int[this->num_processes];
     this->processes_alive = new int[this->num_processes];
-    this->koopas_received = new int[this->num_processes];
-    this->goombas_received = new int[this->num_processes];
+    this->koopas_per_process = new int[this->num_processes];
+    this->goombas_per_process = new int[this->num_processes];
     this->attacking_processes = new int[this->num_processes];
-    this->koopas_to_send = new int[this->num_processes];
-    this->goombas_to_send = new int[this->num_processes];
 
     world = new World();
     mario = new Mario(this->my_pid);
     setProcessesAlive();
-    initCoinsPerProcess();
-    initElementsSentByOthers();
+    initStructuresPerProcess();
     
     // validar la informacion del usuario e imprimir la informacion de lo elegido
     if(mario->getMyId() == 0 && userInputIsValid(&argc, argv))
@@ -368,52 +285,55 @@ void Game::startGame(int argc, char* argv[])
 
     // Asigno el mario que es el elegido para imprimir y la estrategia elegida
     mario->setPickedMario(picked_mario);
-    mario->setStrategy(picked_strategy);
-
 
     //Para los marios que no son el escogido se selecciona una estrategia al azar
     if ( mario->getMyId() != getChosenMario() && mario->getMyId() != 0){
         mario->generateRandomStrategy();
     }
-
-    // Se envia un arreglo de enteros donde cada proceso almacena la cantidad de monedas que tiene al obtener una moneda
-    MPI_Allgather(&this->total_coins, 1, MPI_INT, coins_per_process, 1, MPI_INT, MPI_COMM_WORLD);
+    
+    // si soy el mario elegido, escoger la estrategia que envio el proceso 0
+    if(mario->iAmPickedMario())
+        mario->setStrategy(this->picked_strategy);
 
     // mientras hayan posiciones en el mundo y la cantidad de procesos sea mayor a 2 (2 = el 0 y el ganador)
     int i = 0; 
     while(i < WORLD_SLOTS && getProcessesAlive() > 2)
     {
-        computeLessCoinsMario();
-        computeMoreCoinsMario();
-        computeReceivedElements();
-
-        // poner a quien vamos a atacar en base a la estrategia y a los calculos de arriba, comunicarselo a los demas
-        if(i == 0)
-            mario->chooseEnemy((this->num_processes), 0);
-        else
-            mario->chooseEnemy((this->num_processes), getBeingAttackedBy());
-        chosen_enemy = mario->getEnemy();
-
-        MPI_Allgather(&chosen_enemy, 1, MPI_INT, attacking_processes, 1, MPI_INT, MPI_COMM_WORLD);
-
         // actualizar la posicion de mario
         mario->setLocation(i);
-        if(mario->iAmPickedMario())
+
+        // poner a quien vamos a atacar en base a la estrategia y a los calculos de arriba, comunicarselo a los demas
+        mario->chooseEnemy(this->num_processes, 0);
+        chosen_enemy = mario->getEnemy();
+
+        if(mario->getMyId()!=0)
         {
-            cout << "World pos. " << mario->getLocation() << ". Mario " << mario->getMyId() << " is walking. Coins: " << mario->getCoins() \
-                 << " | attacking #" << mario->getEnemy() << " | being attacked by " << getBeingAttackedBy() \
-                 << " | Attack strategy: " << getStrategyAsString(this->picked_strategy) << ". Total playing: " << (getProcessesAlive()) << endl;
+            cout << "Mario " << mario->getMyId() << " eligio a " << chosen_enemy << " en base a estrategia " << getStrategyAsString(mario->getStrategy()) << endl;
         }
+
+
+        // si soy el mario elegido, imprimo
+        // if(mario->iAmPickedMario())
+            cout << "World pos. " << mario->getLocation() << ". Mario " << mario->getMyId() << " is walking. Coins: " << mario->getCoins() << " | Attack strategy: " << getStrategyAsString(mario->getStrategy()) << ". Total playing: " << (getProcessesAlive()) << endl;
         
         // recorrer el mundo
         movePositions();
         
-        // reportar a todos los otros procesos mi estado y la cantidad de monedas
+        // reportar a todos los otros procesos mi estado y la cantidad de monedas, koopas y goombas
         MPI_Allgather(&this->mario_is_alive, 1, MPI_INT, processes_alive, 1, MPI_INT, MPI_COMM_WORLD);
-        MPI_Allgather(&this->total_coins, 1, MPI_INT, coins_per_process, 1, MPI_INT, MPI_COMM_WORLD);
-        MPI_Allgather(&this->goombas_to_send[mario->getEnemy()], 1, MPI_INT, goombas_received, 1, MPI_INT, MPI_COMM_WORLD);
-        MPI_Allgather(&this->koopas_to_send[mario->getEnemy()], 1, MPI_INT, koopas_received, 1, MPI_INT, MPI_COMM_WORLD);
-        restartEnemiesPerProcessCounters();
+        MPI_Gather(&this->total_coins, 1, MPI_INT, coins_per_process, 1, MPI_INT, 0, MPI_COMM_WORLD);
+        MPI_Gather(&this->koopas, 1, MPI_INT, koopas_per_process, 1, MPI_INT, 0, MPI_COMM_WORLD);
+        MPI_Gather(&this->goombas, 1, MPI_INT, goombas_per_process, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+        // calcular quien tiene mas y menos monedas 
+        if(mario->getMyId() == 0)
+            computeCoinsPerMario();
+
+        // recibir del proceso 0 quien tiene mas y menos
+        MPI_Bcast(&this->mario_less_coins, 1, MPI_INT, 0, MPI_COMM_WORLD);
+        MPI_Bcast(&this->mario_more_coins, 1, MPI_INT, 0, MPI_COMM_WORLD);
+        mario->setMarioWithLessCoins(this->mario_less_coins);
+        mario->setMarioWithMoreCoins(this->mario_more_coins);
         
         /* Esperar a que el proceso cero termine de validar los datos */
         if (mario->getMyId() == 0 && processes_alive[getChosenMario()] == 0 && getProcessesAlive() > 2)

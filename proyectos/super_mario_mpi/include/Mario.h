@@ -22,6 +22,8 @@ class Mario {
         int coins;
         bool alive;
         int action;
+        int koopas_count;
+        int goombas_count;
         Coins coins_object;
         Holes holes_object;
         KoopaTroopas koopa_object;
@@ -36,6 +38,8 @@ class Mario {
         void setIsAlive(bool);
         void setPickedMario(int);
         void setStrategy(Strategy);
+        void setKoopas();
+        void setGoombas();
         Strategy getStrategy();
         int getMyId();
         int getLocation();
@@ -45,14 +49,14 @@ class Mario {
         int chooseAction(int);
         int getMarioWithLessCoins();
         int getMarioWithMoreCoins();
-        int getTotalLessCoins();
-        int getTotalMoreCoins();
-        void setMarioWithLessCoins(int, int);
-        void setMarioWithMoreCoins(int, int);
+        void setMarioWithLessCoins(int);
+        void setMarioWithMoreCoins(int);
         double generateRandomNumber(int);
         Action getActionForElement(Element element);
         void generateRandomStrategy();
         void chooseEnemy(int, int);
         int getEnemy();
+        int getKoopas();
+        int getGoombas();
 };
 #endif
