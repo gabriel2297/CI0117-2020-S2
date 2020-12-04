@@ -39,15 +39,15 @@ std::string getActionAsString(Action action)
     switch(action)
     {
         case no_jump:
-            return "Mario didn't jump";
+            return " didn't jump ";
         case jump_and_hit:
-            return "Mario jumped and grabbed a coin!";
+            return " jumped and grabbed a coin!";
         case jump_and_kill:
-            return "Mario jumped and killed the ";
+            return " jumped and killed the ";
         case jump_and_move:
-            return "Mario jumped and moved to the next position";
+            return " jumped and moved to the next position";
         default:
-            return "Mario is walking.";
+            return " is walking.";
     }
 }
 

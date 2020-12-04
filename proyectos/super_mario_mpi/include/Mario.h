@@ -12,6 +12,11 @@ class Mario {
     private:
         int mario_id;
         int picked_mario_id;
+        int chosen_enemy;
+        int mario_with_more_coins;
+        int mario_with_less_coins;
+        int total_less_coins;
+        int total_more_coins;
         Strategy picked_strategy;
         int location;
         int coins;
@@ -21,6 +26,8 @@ class Mario {
         Holes holes_object;
         KoopaTroopas koopa_object;
         LittleGoombas goombas_object;
+        void setEnemy(int);
+
     public:
         Mario(int);
         ~Mario();
@@ -36,8 +43,16 @@ class Mario {
         bool isAlive();
         bool iAmPickedMario();
         int chooseAction(int);
-        double generateRandomNumber();
+        int getMarioWithLessCoins();
+        int getMarioWithMoreCoins();
+        int getTotalLessCoins();
+        int getTotalMoreCoins();
+        void setMarioWithLessCoins(int, int);
+        void setMarioWithMoreCoins(int, int);
+        double generateRandomNumber(int);
         Action getActionForElement(Element element);
         void generateRandomStrategy();
+        void chooseEnemy(int, int);
+        int getEnemy();
 };
 #endif

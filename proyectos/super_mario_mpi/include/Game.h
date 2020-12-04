@@ -12,11 +12,14 @@ class Game
         int picked_mario;
         int num_processes;
         int my_pid;
+        int chosen_enemy;
         int * processes_alive;
         int * coins_per_process;
         int * attacking_processes;
         int * koopas_received;
         int * goombas_received;
+        int * koopas_to_send;
+        int * goombas_to_send;
         int koopas;
         int goombas;
         double start_time, end_time;
@@ -45,6 +48,11 @@ class Game
         void initCoinsPerProcess();
         void computeReceivedElements();
         void restartEnemiesPerProcessCounters();
+        void getElementsFromEnemies();
+        void distributeElementsForEnemy(Element element);
+        void initElementsSentByOthers();
+        void printMariosActionBasedOnElement(Action, Element);
+        int getBeingAttackedBy();
     public:
         void startGame(int argc, char* argv[]);
         Game();

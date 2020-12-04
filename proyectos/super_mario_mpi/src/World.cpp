@@ -39,7 +39,7 @@ void World::pushElement(Element element, int index)
  * @return the total elements in this position
  */
 int World::getTotalElementsInPosition(int index)
-{
+{   
     return this->world[index].size();
 }
 
@@ -50,10 +50,7 @@ int World::getTotalElementsInPosition(int index)
 Element World::getNextElementInPosition(int index)
 {
     if (this->world[index].empty())
-    {
-        cout << "no elements in getNextElementInposition" << endl;
         return None;
-    }
     switch (this->world[index].front())
     {
         case Coin:
