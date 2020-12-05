@@ -152,5 +152,48 @@ MPI_Bcast(&picked_mario, 1, MPI_INT, 0, MPI_COMM_WORLD);
 ```
 Con esta función se le envia a los demás procesos cual Mario ha sido seleccionado por el usuario.
 
+
+```
+❯ MPI_Gather()
+```
+Distribuye los valores locales de todos los procesos hacia el proceso raiz
+En el programa es utilizado para enviar la estrategia escogida por los procesos al proceso 0.
+
+```
+MPI_Gather(&this->picked_strategy, 1, MPI_INT, strategy_per_process, 1, MPI_INT, 0, MPI_COMM_WORLD);
+```
+
+```
+❯ MPI_Scatter()
+```
+Distribuye los valores de el buffer de envio del proceso raiz hacia los demás procesos
+
+En el programa es utilizado para enviar la cantidad de koopas o goombas a los demás procesos
+
+```
+MPI_Gather(&this->koopas, 1, MPI_INT, koopas_per_process, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+```
+
+```
+❯ MPI_Send()
+```
+Envia datos de un proceso hacia el proceso destino
+En el programa es utilizado por el proceso cero para enviarle a los demás procesos a cual proceso deben de atacar.
+
+```
+MPI_Send(&attacking_processes[h], 1, MPI_INT, h, 123, MPI_COMM_WORLD);
+```
+
+```
+❯ MPI_Recv()
+```
+Recibe datos del proceso especificado
+En el programa es utilizado por los procesos jugadores para recibir el id del mario a atacar
+
+```
+MPI_Recv(&chosen_enemy, 1, MPI_INT, 0, 123, MPI_COMM_WORLD, &status);
+```
+
 Estas funciones de MPI explicadas anteriormente fueron fundamentales para asegurar el debido envio y recibo de mensajes entre procesos, de manera que sea posible realizar una comunicación eficaz y que la ejecución del programa se cumpla correctamente.
 

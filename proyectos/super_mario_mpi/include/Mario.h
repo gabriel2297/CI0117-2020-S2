@@ -50,7 +50,7 @@ class Mario {
         int getMarioWithMoreCoins();
         void setMarioWithLessCoins(int);
         void setMarioWithMoreCoins(int);
-        double generateRandomNumber(int);
+        double generateRandomNumber(int, int);
         Action getActionForElement(Element element);
         void generateRandomStrategy();
         void chooseEnemy(int, int);

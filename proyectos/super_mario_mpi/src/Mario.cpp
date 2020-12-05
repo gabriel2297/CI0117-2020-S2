@@ -89,7 +89,7 @@ int Mario::getCoins(){
 Action Mario::getActionForElement(Element element)
 {
     int limit = 100;
-    double random_number = generateRandomNumber(limit);
+    double random_number = generateRandomNumber(limit, -1);
     switch (element)
     {
         case Coin:
@@ -106,16 +106,19 @@ Action Mario::getActionForElement(Element element)
     }
 }
 
-double Mario::generateRandomNumber(int limit)
+double Mario::generateRandomNumber(int limit, int pid)
 {
-    srand((unsigned) time(NULL) * getMyId() * 1000);
+    int process_id = getMyId();
+    if(pid != -1)
+        process_id = pid;
+    srand((unsigned) time(NULL) * process_id * 1000);
     return (rand() % limit) + 1;
 }
 
 void Mario::generateRandomStrategy(){
     int limit = 100;
     srand((unsigned) time(NULL) * getMyId() * 1000);
-    double random_number = generateRandomNumber(limit);
+    double random_number = generateRandomNumber(limit, -1);
     if(random_number >= 75)
         this->setStrategy(random_strategy);
     else if (random_number >= 50 && random_number < 75)
@@ -129,7 +132,7 @@ void Mario::generateRandomStrategy(){
 void Mario::chooseEnemy(int limit, int attacked_by)
 {
     Strategy strategy = getStrategy();
-    int random_enemy_picker = generateRandomNumber(limit);
+    int random_enemy_picker = generateRandomNumber(limit, -1);
     switch(strategy)
     {
         case less_coins:
@@ -140,12 +143,12 @@ void Mario::chooseEnemy(int limit, int attacked_by)
             break;
         case random_strategy:
             while(random_enemy_picker == getMyId() || random_enemy_picker == 0)
-                random_enemy_picker = generateRandomNumber(limit);
+                random_enemy_picker = generateRandomNumber(limit, -1);
             setEnemy(random_enemy_picker);
             break;
         case attacker:
             while(random_enemy_picker == getMyId() || random_enemy_picker == 0)
-                random_enemy_picker = generateRandomNumber(limit);
+                random_enemy_picker = generateRandomNumber(limit, -1);
             setEnemy(random_enemy_picker);
             break;
         default:
