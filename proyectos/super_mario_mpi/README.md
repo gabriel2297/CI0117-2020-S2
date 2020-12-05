@@ -168,18 +168,6 @@ MPI_Gather(&this->picked_strategy, 1, MPI_INT, strategy_per_process, 1, MPI_INT,
 ```
 
 ```
-❯ MPI_Scatter()
-```
-Distribuye los valores de el buffer de envio del proceso raiz hacia los demás procesos
-
-En el programa es utilizado para enviar la cantidad de koopas o goombas a los demás procesos
-
-```
-MPI_Gather(&this->koopas, 1, MPI_INT, koopas_per_process, 1, MPI_INT, 0, MPI_COMM_WORLD);
-
-```
-
-```
 ❯ MPI_Send()
 ```
 Envia datos de un proceso hacia el proceso destino
