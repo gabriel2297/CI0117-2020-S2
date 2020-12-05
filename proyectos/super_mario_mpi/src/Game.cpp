@@ -14,6 +14,7 @@ Game::Game(){
     this->mario_more_coins = 0;
     this->koopas = 0;
     this->goombas = 0;
+    this->chosen_enemy = 0;
 }
 Game::~Game(){}
 
@@ -150,14 +151,14 @@ void Game::doActions(Action action, Element element)
                 mario->setIsAlive(false);
                 this->mario_is_alive = mario->isAlive();
                 if(mario->iAmPickedMario())
-                    cout << "World pos. " << mario->getLocation() << ". Mario " << mario->getMyId() << getActionAsString(action) << " and was killed by a " << getElementAsString(element) <<  ". Attack strategy: " << getStrategyAsString(this->picked_strategy) << ". Total playing: " << (getProcessesAlive()-1) << endl;
+                    cout << "World pos. " << mario->getLocation() << ". Mario " << mario->getMyId() << getActionAsString(action) << " and was killed by a " << getElementAsString(element) << ". Coins: " << mario->getCoins() << " | attacking #" << mario->getEnemy() <<  " | Attack strategy: " << getStrategyAsString(mario->getStrategy()) << ". Total playing: " << (getProcessesAlive()) << endl;
             }
             break;
         case jump_and_hit:
             mario->setCoins();
             ++this->total_coins;
             if (mario->iAmPickedMario())
-                cout << "World pos. " << mario->getLocation() << ". Mario " << mario->getMyId() << getActionAsString(action) <<  " Attack strategy: " << getStrategyAsString(this->picked_strategy) << ". Total playing: " << (getProcessesAlive()-1) << endl;
+                cout << "World pos. " << mario->getLocation() << ". Mario " << mario->getMyId() << getActionAsString(action) << ". Coins: " << mario->getCoins() << " | attacking #" << mario->getEnemy() <<  " | Attack strategy: " << getStrategyAsString(mario->getStrategy()) << ". Total playing: " << (getProcessesAlive()) << endl;
             break;
         case jump_and_kill:
             if (element == LittleGoomba){
@@ -168,11 +169,11 @@ void Game::doActions(Action action, Element element)
                 ++this->koopas;
             }
             if (mario->iAmPickedMario())
-                cout << "World pos. " << mario->getLocation() << ". Mario " << mario->getMyId() << getActionAsString(action) <<  getElementAsString(element) <<  " Attack strategy: " << getStrategyAsString(this->picked_strategy) << ". Total playing: " << (getProcessesAlive()-1) << endl;
+                cout << "World pos. " << mario->getLocation() << ". Mario " << mario->getMyId() << getActionAsString(action) <<  getElementAsString(element) << ". Coins: " << mario->getCoins() << " | attacking #" << mario->getEnemy() <<  " | Attack strategy: " << getStrategyAsString(mario->getStrategy()) << ". Total playing: " << (getProcessesAlive()) << endl;
             break;
         case jump_and_move:
             if (mario->iAmPickedMario())
-                cout << "World pos. " << mario->getLocation() << ". Mario " << mario->getMyId() << getActionAsString(action) <<  ". Attack strategy: " << getStrategyAsString(this->picked_strategy) << ". Total playing: " << (getProcessesAlive()-1) << endl;
+                cout << "World pos. " << mario->getLocation() << ". Mario " << mario->getMyId() << getActionAsString(action) << ". Coins: " << mario->getCoins() << " | attacking #" << mario->getEnemy() <<  " | Attack strategy: " << getStrategyAsString(mario->getStrategy()) << ". Total playing: " << (getProcessesAlive()) << endl;
             break;
         case no_action:
             break;
@@ -224,6 +225,7 @@ void Game::initStructuresPerProcess()
         koopas_per_process[i] = 0;
         goombas_per_process[i] = 0;
         attacking_processes[i] = 0;
+        strategy_per_process[i] = 0;
     }
 }
 
@@ -245,8 +247,71 @@ void Game::computeCoinsPerMario()
             }
         }
     }
-    cout << "Proceso con mas monedas = " << this->mario_more_coins << endl;
-    cout << "Proceso con menos monedas = " << this->mario_less_coins << endl;
+}
+
+void Game::computeAttackerPerMario()
+{
+    cout << "calculando valor" << endl;
+    Strategy strategy;
+    int random_num;
+    int attacking_mario = -1;
+    bool found = false;
+    for (int i = 0; i < this->num_processes; ++i)
+    {
+        if(i == 0)
+        {
+            attacking_processes[i] = -1;
+            continue;
+        }
+        strategy = static_cast<Strategy>(strategy_per_process[i]);
+        switch (strategy)
+        {
+            case less_coins:
+                attacking_processes[i] = this->mario_less_coins;
+                break;
+            case more_coins:
+                attacking_processes[i] = this->mario_more_coins;
+                break;    
+            case attacker:
+                for (int y = 1; y < this->num_processes && !found; ++y){
+                    if (attacking_processes[i] == mario->getMyId()){
+                        attacking_mario = y;
+                        found = true;
+                    }
+                    attacking_processes[i] = attacking_mario;
+                }
+                if(!found)
+                {
+                    random_num = mario->generateRandomNumber(this->num_processes);
+                    while(random_num == i || random_num == 0)
+                        random_num = mario->generateRandomNumber(this->num_processes);
+                    attacking_processes[i] = random_num;
+                }
+                break;
+            case random_strategy:
+                random_num = mario->generateRandomNumber(this->num_processes);
+                while(random_num == i || random_num == 0)
+                    random_num = mario->generateRandomNumber(this->num_processes);
+                attacking_processes[i] = random_num;
+                break;
+            default:
+                break;      
+        }
+    }
+}
+
+/**
+ * Metodo de ayuda para imprimir todas las estrategias 
+ * que han sido elegidas por cada proceso
+*/
+void Game::printAllStrategies()
+{
+    Strategy strategy;
+    for(int i = 0; i < this->num_processes; ++i)
+    {
+        strategy = static_cast<Strategy>(strategy_per_process[i]);
+        cout << "Proceso " << i << " usando estrategia " << getStrategyAsString(strategy) << endl;
+    }
 }
 
 /**
@@ -259,6 +324,7 @@ void Game::startGame(int argc, char* argv[])
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &this->num_processes);
     MPI_Comm_rank(MPI_COMM_WORLD, &this->my_pid);
+    MPI_Status status;
 
     // crear las variables a utilizar e instanciar objetos
     this->coins_per_process = new int[this->num_processes];
@@ -266,6 +332,7 @@ void Game::startGame(int argc, char* argv[])
     this->koopas_per_process = new int[this->num_processes];
     this->goombas_per_process = new int[this->num_processes];
     this->attacking_processes = new int[this->num_processes];
+    this->strategy_per_process = new int[this->num_processes];
 
     world = new World();
     mario = new Mario(this->my_pid);
@@ -282,6 +349,7 @@ void Game::startGame(int argc, char* argv[])
     // Se envia el id del mario escogido y la estrategia
     MPI_Bcast(&picked_mario, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(&picked_strategy, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    //MPI_Bcast(&this->chosen_enemy, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
     // Asigno el mario que es el elegido para imprimir y la estrategia elegida
     mario->setPickedMario(picked_mario);
@@ -295,6 +363,10 @@ void Game::startGame(int argc, char* argv[])
     if(mario->iAmPickedMario())
         mario->setStrategy(this->picked_strategy);
 
+    // poner mi estrategia y mandarle al proceso 0 mi estrategia
+    this->picked_strategy = mario->getStrategy();
+    MPI_Gather(&this->picked_strategy, 1, MPI_INT, strategy_per_process, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
     // mientras hayan posiciones en el mundo y la cantidad de procesos sea mayor a 2 (2 = el 0 y el ganador)
     int i = 0; 
     while(i < WORLD_SLOTS && getProcessesAlive() > 2)
@@ -302,23 +374,29 @@ void Game::startGame(int argc, char* argv[])
         // actualizar la posicion de mario
         mario->setLocation(i);
 
-        // poner a quien vamos a atacar en base a la estrategia y a los calculos de arriba, comunicarselo a los demas
-        mario->chooseEnemy(this->num_processes, 0);
-        chosen_enemy = mario->getEnemy();
-
-        if(mario->getMyId()!=0)
+        // proceso 0 hace un scatter indicandole a los otros procesos a quien atacan.
+        if(mario->getMyId() == 0)
         {
-            cout << "Mario " << mario->getMyId() << " eligio a " << chosen_enemy << " en base a estrategia " << getStrategyAsString(mario->getStrategy()) << endl;
+            computeAttackerPerMario();
+            for(int h = 1; h < this->num_processes; ++h)
+            {
+                MPI_Send(&attacking_processes[h], 1, MPI_INT, h, 123, MPI_COMM_WORLD);
+            }
+            cout << "valor enviado" << endl;
+        }
+        
+        if(mario->getMyId() != 0)
+        {
+            MPI_Recv(&chosen_enemy, 1, MPI_INT, 0, 123, MPI_COMM_WORLD, &status);
         }
 
-
-        // si soy el mario elegido, imprimo
+        // // si soy el mario elegido, imprimo
         // if(mario->iAmPickedMario())
-            cout << "World pos. " << mario->getLocation() << ". Mario " << mario->getMyId() << " is walking. Coins: " << mario->getCoins() << " | Attack strategy: " << getStrategyAsString(mario->getStrategy()) << ". Total playing: " << (getProcessesAlive()) << endl;
-        
+            cout << "World pos. " << mario->getLocation() << ". Mario " << mario->getMyId() << " is walking. Coins: " << mario->getCoins() << " | attacking #" << chosen_enemy <<  " | Attack strategy: " << getStrategyAsString(mario->getStrategy()) << ". Total playing: " << (getProcessesAlive()) << endl;
+
         // recorrer el mundo
         movePositions();
-        
+
         // reportar a todos los otros procesos mi estado y la cantidad de monedas, koopas y goombas
         MPI_Allgather(&this->mario_is_alive, 1, MPI_INT, processes_alive, 1, MPI_INT, MPI_COMM_WORLD);
         MPI_Gather(&this->total_coins, 1, MPI_INT, coins_per_process, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -334,7 +412,6 @@ void Game::startGame(int argc, char* argv[])
         MPI_Bcast(&this->mario_more_coins, 1, MPI_INT, 0, MPI_COMM_WORLD);
         mario->setMarioWithLessCoins(this->mario_less_coins);
         mario->setMarioWithMoreCoins(this->mario_more_coins);
-        
         /* Esperar a que el proceso cero termine de validar los datos */
         if (mario->getMyId() == 0 && processes_alive[getChosenMario()] == 0 && getProcessesAlive() > 2)
             pickMario();

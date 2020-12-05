@@ -28,7 +28,6 @@ class Mario {
         Holes holes_object;
         KoopaTroopas koopa_object;
         LittleGoombas goombas_object;
-        void setEnemy(int);
 
     public:
         Mario(int);
@@ -58,5 +57,6 @@ class Mario {
         int getEnemy();
         int getKoopas();
         int getGoombas();
+        void setEnemy(int);
 };
 #endif

@@ -9,25 +9,14 @@ void Mapper::setElementsAtIndex(World * world, int index){
   switch (index) {
     case 9:
             world->pushElement(Coin, index);
-            world->pushElement(Coin, index);
-            world->pushElement(Coin, index);
-            world->pushElement(KoopaTroopa, index);
-            world->pushElement(Coin, index);
-            world->pushElement(KoopaTroopa, index);
-            world->pushElement(KoopaTroopa, index);
-            world->pushElement(LittleGoomba, index);
-            world->pushElement(LittleGoomba, index);
-            world->pushElement(KoopaTroopa, index);
             break;
     case 12:
-            world->pushElement(LittleGoomba, index);
-            world->pushElement(LittleGoomba, index);
-            world->pushElement(LittleGoomba, index);
             world->pushElement(LittleGoomba, index);
             world->pushElement(Coin, index);
             world->pushElement(Coin, index);
             break;
     case 21:
+            world->pushElement(LittleGoomba, index);
             world->pushElement(LittleGoomba, index);
             break;
     case 26:
