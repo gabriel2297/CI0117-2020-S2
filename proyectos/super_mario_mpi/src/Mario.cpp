@@ -1,5 +1,6 @@
 #include "../include/Mario.h"
 
+
 using namespace std;
 
 Mario::Mario(int pid){
@@ -112,7 +113,16 @@ double Mario::generateRandomNumber(int limit, int pid)
     if(pid != -1)
         process_id = pid;
     srand((unsigned) time(NULL) * process_id * 1000);
-    return (rand() % limit) + 1;
+    return rand() % limit + 1;
+}
+
+double Mario::generateRandomNumberFromArray(std::vector<int> *the_vector, int pid)
+{
+    int process_id = getMyId();
+    if(pid != -1)
+        process_id = pid;
+    srand((unsigned) time(NULL) * process_id * 1000);
+    return rand() % the_vector->size();
 }
 
 void Mario::generateRandomStrategy(){

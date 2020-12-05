@@ -46,9 +46,13 @@ Donde los argumentos Mario y Strategy corresponden al mario a monitorear durante
 
 [Demostracion de ejecucion en terminal]
 ```
-$ mpiexec -n 5 --oversubscribe ./super_mario_mpi 3 L
-Mario elegido: 4. Estrategia = less_coins. Total de procesos: 4
-Mario 3
+$mpiexec -n 20 --oversubscribe ./super_mario_mpi 15 L
+Mario elegido: 15. Estrategia: less_coins. Total de procesos: 19
+World pos. 0. Mario 15 is walking. Coins: 0 | attacking #0 | Attack strategy: less_coins. Total playing: 19
+World pos. 1. Mario 15 is walking. Coins: 0 | attacking #1 | Attack strategy: less_coins. Total playing: 19
+World pos. 2. Mario 15 is walking. Coins: 0 | attacking #1 | Attack strategy: less_coins. Total playing: 19
+World pos. 3. Mario 15 is walking. Coins: 0 | attacking #1 | Attack strategy: less_coins. Total playing: 19
+World pos. 3. Mario 15 didn't jump  and was killed by a Little Goomba. Coins: 0 | attacking #1 | Attack strategy: less_coins. Total playing: 19
  
 ```
 

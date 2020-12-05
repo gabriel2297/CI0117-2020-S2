@@ -7,6 +7,7 @@
 #include "./WorldElements/Holes.h"
 #include "./WorldElements/KoopaTroopas.h"
 #include "./WorldElements/LittleGoombas.h"
+#include <vector>
 
 class Mario {
     private:
@@ -52,6 +53,7 @@ class Mario {
         void setMarioWithMoreCoins(int);
         double generateRandomNumber(int, int);
         Action getActionForElement(Element element);
+        double generateRandomNumberFromArray(std::vector<int> *the_vector, int pid);
         void generateRandomStrategy();
         void chooseEnemy(int, int);
         int getEnemy();

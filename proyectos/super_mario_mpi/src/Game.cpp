@@ -124,6 +124,19 @@ void Game::setProcessesAlive()
         this->processes_alive[i] = 1;
 }
 
+std::vector<int> Game::getProcessesAliveAsVector()
+{
+    std::vector<int> list;
+    for(int i = 1; i < this->num_processes; ++i)
+    {
+        if(isProcessAlive(i))
+        {
+            list.push_back(i);
+        }
+    }
+    return list;
+}
+
 /**
  * Helper method to know which processes are still alive.
  * Prints 1 if alive, 0 if dead
@@ -224,10 +237,12 @@ void Game::initStructuresPerProcess()
     for(int i = 0; i < this->num_processes; ++i)
     {
         coins_per_process[i] = 0;
-        koopas_per_process[i] = 0;
-        goombas_per_process[i] = 0;
+        koopas_received[i] = 0;
+        goombas_received[i] = 0;
         attacking_processes[i] = 0;
         strategy_per_process[i] = 0;
+        koopas_to_send[i] = 0;
+        goombas_to_send[i] = 0;
     }
 }
 
@@ -257,6 +272,7 @@ void Game::computeAttackerPerMario()
     int random_num;
     int attacking_mario = -1;
     bool found = false;
+    std::vector<int> vector_of_alive_processes;
     for (int i = 0; i < this->num_processes; ++i)
     {
         if(i == 0)
@@ -313,20 +329,51 @@ void Game::computeAttackerPerMario()
                 }
                 if(!found)
                 {
-                    random_num = mario->generateRandomNumber(this->num_processes, i);
-                    while(random_num == i || random_num == 0)
-                        random_num = mario->generateRandomNumber(this->num_processes, i);
-                    attacking_processes[i] = random_num;
+                    vector_of_alive_processes = getProcessesAliveAsVector();
+                    random_num = mario->generateRandomNumberFromArray(&vector_of_alive_processes, i);
+                    attacking_processes[i] = vector_of_alive_processes[random_num];
                 }
                 break;
             case random_strategy:
-                random_num = mario->generateRandomNumber(this->num_processes, i);
-                while(random_num == i || random_num == 0)
-                    random_num = mario->generateRandomNumber(this->num_processes, i);
-                attacking_processes[i] = random_num;
+                vector_of_alive_processes = getProcessesAliveAsVector();
+                random_num = mario->generateRandomNumberFromArray(&vector_of_alive_processes, i);
+                attacking_processes[i] = vector_of_alive_processes[random_num];
                 break;
             default:
                 break;      
+        }
+    }
+}
+
+void Game::computeKoopas()
+{
+    int attacking = 0;
+    for (int j = 0; j < this->num_processes; ++j)
+    {
+        if (j == 0)
+        {
+            koopas_to_send[j] = -1;
+        } else {
+            //A quien le ataca este proceso
+            attacking = attacking_processes[j];
+            koopas_to_send[attacking] = koopas_to_send[attacking] + koopas_received[j];
+        } 
+    }    
+}
+
+
+void Game::computeGoombas()
+{
+    int attacking = 0;
+    for(int x = 0; x < this->num_processes; ++x)
+    {
+        if(x == 0)
+            goombas_to_send[x] = -1;
+        else
+        {
+            // ver a quien esta atacando este proceso
+            attacking = attacking_processes[x];
+            goombas_to_send[attacking] = goombas_to_send[attacking] + goombas_received[x];
         }
     }
 }
@@ -345,6 +392,41 @@ void Game::printAllStrategies()
     }
 }
 
+void Game::reiniciarElementos()
+{
+    for(int i = 0; i < this->num_processes; ++i)
+    {
+        this->goombas_received[i] = 0;
+        this->goombas_to_send[i] = 0;
+        this->koopas_to_send[i] = 0;
+        this->koopas_received[i] = 0;
+    }
+}
+
+void Game::addGoombasToWorld()
+{
+    int total_goombas = goombas_received[0];
+    int location = mario->getLocation();
+    int position = (location + 10 > WORLD_SLOTS) ? ((location + 10) - WORLD_SLOTS) : (location + 10);
+    while(total_goombas > 0)
+    {
+        world->pushElement(LittleGoomba, position);
+        --total_goombas;
+    }
+}
+
+void Game::addKoopasToWorld()
+{
+    int total_koopas = koopas_received[0];
+    int location = mario->getLocation();
+    int position = (location + 10 > WORLD_SLOTS) ? ((location + 10) - WORLD_SLOTS) : (location + 10);
+    while (total_koopas > 0)
+    {
+        world->pushElement(KoopaTroopa, position);
+        --total_koopas;
+    }
+}
+
 /**
  * Starts the game with the arguments passed via terminal.
  * Takes care of all MPI related processes
@@ -360,10 +442,12 @@ void Game::startGame(int argc, char* argv[])
     // crear las variables a utilizar e instanciar objetos
     this->coins_per_process = new int[this->num_processes];
     this->processes_alive = new int[this->num_processes];
-    this->koopas_per_process = new int[this->num_processes];
-    this->goombas_per_process = new int[this->num_processes];
+    this->koopas_received = new int[this->num_processes];
+    this->goombas_received = new int[this->num_processes];
     this->attacking_processes = new int[this->num_processes];
     this->strategy_per_process = new int[this->num_processes];
+    this->koopas_to_send = new int[this->num_processes];
+    this->goombas_to_send = new int[this->num_processes];
 
     world = new World();
     mario = new Mario(this->my_pid);
@@ -430,8 +514,44 @@ void Game::startGame(int argc, char* argv[])
         // reportar a todos los otros procesos mi estado y la cantidad de monedas, koopas y goombas
         MPI_Allgather(&this->mario_is_alive, 1, MPI_INT, processes_alive, 1, MPI_INT, MPI_COMM_WORLD);
         MPI_Gather(&this->total_coins, 1, MPI_INT, coins_per_process, 1, MPI_INT, 0, MPI_COMM_WORLD);
-        MPI_Gather(&this->koopas, 1, MPI_INT, koopas_per_process, 1, MPI_INT, 0, MPI_COMM_WORLD);
-        MPI_Gather(&this->goombas, 1, MPI_INT, goombas_per_process, 1, MPI_INT, 0, MPI_COMM_WORLD);
+        MPI_Gather(&this->koopas, 1, MPI_INT, koopas_received, 1, MPI_INT, 0, MPI_COMM_WORLD);
+        MPI_Gather(&this->goombas, 1, MPI_INT, goombas_received, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+        // reiniciar koopas y goombas
+        this->koopas = 0;
+        this->goombas = 0;
+
+        // proceso 0 hace un send indicandole a los otros procesos cuantos koopas o goombas tienen que meter
+        if(mario->getMyId() == 0)
+        {
+            computeKoopas();
+            for(int h = 1; h < this->num_processes; ++h)
+            {
+                MPI_Send(&koopas_to_send[h], 1, MPI_INT, h, 123, MPI_COMM_WORLD);
+            }
+            computeGoombas();
+            for(int h = 1; h < this->num_processes; ++h)
+            {
+                MPI_Send(&goombas_to_send[h], 1, MPI_INT, h, 123, MPI_COMM_WORLD);
+            }
+        }
+        
+        if(mario->getMyId() != 0)
+        {
+            MPI_Recv(&koopas_received[0], 1, MPI_INT, 0, 123, MPI_COMM_WORLD, &status);
+            if(koopas_received[0] > 0)
+            {
+                addKoopasToWorld();
+            }
+            MPI_Recv(&goombas_received[0], 1, MPI_INT, 0, 123,MPI_COMM_WORLD, &status);
+            if(goombas_received[0] > 0)
+            {
+                addGoombasToWorld();
+            }
+        }
+
+        // reiniciar koopas/goombas
+        reiniciarElementos();
 
         // calcular quien tiene mas y menos monedas 
         if(mario->getMyId() == 0)
@@ -456,17 +576,24 @@ void Game::startGame(int argc, char* argv[])
         if (i == WORLD_SLOTS - 1){
             i = 0;
         }
-
-        // revisar si tengo que empujar algun enemigo
-        if(my_pid == 0)
-            printAliveProcesses();
         ++i;
     }
 
     if(my_pid == 0)
         printWinnerMario();
 
+
     MPI_Finalize();
+
+    delete [] this->coins_per_process;
+    delete [] this->processes_alive;
+    delete [] this->koopas_received;
+    delete [] this->goombas_received;
+    delete [] this->attacking_processes; 
+    delete [] this->strategy_per_process ;
+    delete [] this->koopas_to_send;
+    delete [] this->goombas_to_send;
+
     delete world;
     delete mario;
 }

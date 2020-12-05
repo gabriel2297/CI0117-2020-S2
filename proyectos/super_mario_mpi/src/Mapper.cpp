@@ -7,16 +7,27 @@ Mapper::~Mapper(){}
 
 void Mapper::setElementsAtIndex(World * world, int index){
   switch (index) {
-    case 9:
-            world->pushElement(Coin, index);
-            break;
-    case 12:
+        case 3:
             world->pushElement(LittleGoomba, index);
+            world->pushElement(KoopaTroopa, index);
             world->pushElement(Coin, index);
+            world->pushElement(Coin, index);
+        case 9:
+            world->pushElement(Coin, index);
+            world->pushElement(LittleGoomba, index);
+            world->pushElement(LittleGoomba, index);
+            break;
+        case 12:
+            world->pushElement(KoopaTroopa, index);
+            world->pushElement(Coin, index);
+            world->pushElement(KoopaTroopa, index);
             world->pushElement(Coin, index);
             break;
     case 21:
             world->pushElement(LittleGoomba, index);
+            world->pushElement(KoopaTroopa, index);
+            world->pushElement(KoopaTroopa, index);
+            world->pushElement(KoopaTroopa, index);
             world->pushElement(LittleGoomba, index);
             break;
     case 26:
@@ -24,6 +35,10 @@ void Mapper::setElementsAtIndex(World * world, int index){
             break;
     case 27:
             world->pushElement(LittleGoomba, index);
+            world->pushElement(KoopaTroopa, index);
+            world->pushElement(KoopaTroopa, index);
+            world->pushElement(KoopaTroopa, index);
+            world->pushElement(KoopaTroopa, index);
             break;
     case 35:
             world->pushElement(Hole, index);
@@ -33,6 +48,9 @@ void Mapper::setElementsAtIndex(World * world, int index){
             break;
     case 40:
             world->pushElement(Coin, index);
+            world->pushElement(KoopaTroopa, index);
+            world->pushElement(KoopaTroopa, index);
+            world->pushElement(KoopaTroopa, index);
             break;
     case 41:
             world->pushElement(LittleGoomba, index);

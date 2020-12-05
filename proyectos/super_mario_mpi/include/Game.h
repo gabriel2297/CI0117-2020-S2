@@ -3,7 +3,7 @@
 #include "enums.h"
 #include "World.h"
 #include "Mario.h"
-#include <list>
+#include <vector>
 
 #define TOTAL_STRATEGIES 4
 
@@ -16,8 +16,10 @@ class Game
         int chosen_enemy;
         int * processes_alive;
         int * coins_per_process;
-        int * koopas_per_process;
-        int * goombas_per_process;
+        int * koopas_received;
+        int * goombas_received;
+        int * goombas_to_send;
+        int * koopas_to_send;
         int * attacking_processes;
         int * strategy_per_process;
         double start_time, end_time;
@@ -48,6 +50,12 @@ class Game
         bool isProcessAlive(int pid);
         void printAllStrategies();
         void computeAttackerPerMario();
+        void computeGoombas();
+        void computeKoopas();
+        void reiniciarElementos();
+        void addGoombasToWorld();
+        void addKoopasToWorld();
+        std::vector<int> getProcessesAliveAsVector();
     public:
         void startGame(int argc, char* argv[]);
         Game();
