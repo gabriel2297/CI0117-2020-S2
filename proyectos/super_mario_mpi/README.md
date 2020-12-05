@@ -9,15 +9,15 @@
 
 El código fuente del programa se encuentra en GitHub.  Requerimientos para poder correr la solución:
 1. Sistema Operativo Ubuntu 14.04 o superior.
-2. Instalación del GNU Compiler (gcc) y de  “make”. Para instalar, abrir el terminal del equipo y correr:
+2. Instalación del GNU Compiler (g++) y de  “make”. Para instalar, abrir el terminal del equipo y correr:
 ```
 ❯ sudo apt update
 ❯ sudo apt install build-essential
 ```
 3. Para verificar que se haya instalado correctamente, al correr los siguientes comandos debemos obtener un resultado similar
 ```
-❯ which gcc
-/usr/bin/gcc
+❯ which g++
+/usr/bin/g++
 ❯ which make
 /usr/bin/make
 ```
